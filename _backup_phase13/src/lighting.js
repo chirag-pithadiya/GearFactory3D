@@ -173,11 +173,11 @@ export function createWorkshopEnvironment(scene) {
  */
 export function setupLighting(scene) {
   // 1. Ambient Light: Clear, warm-neutral workshop fill ensuring zero pitch-black areas
-  const ambientLight = new THREE.AmbientLight(0xe8eef5, 1.45);
+  const ambientLight = new THREE.AmbientLight(0xf0f4f8, 1.65);
   scene.add(ambientLight);
 
   // 2. Warm Key Directional Light: Warm high-angle industrial work lamp
-  const keyLight = new THREE.DirectionalLight(0xfff0d8, 2.85);
+  const keyLight = new THREE.DirectionalLight(0xfff2dc, 3.0);
   keyLight.position.set(10, 20, 14);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.width = 2048;
@@ -192,59 +192,36 @@ export function setupLighting(scene) {
   scene.add(keyLight);
 
   // 3. Cool Neutral Fill Light: Soft bounce from open factory bay
-  const frontFillLight = new THREE.DirectionalLight(0xd2e2f2, 1.75);
+  const frontFillLight = new THREE.DirectionalLight(0xd6e6f6, 1.85);
   frontFillLight.position.set(-10, 14, 14);
   scene.add(frontFillLight);
 
   // 4. Rim / Edge Light: Crisp metallic highlights on gear teeth and polished shafts
-  const rimLight = new THREE.DirectionalLight(0xbad2eb, 2.10);
+  const rimLight = new THREE.DirectionalLight(0xb8d4f0, 2.2);
   rimLight.position.set(-14, 14, -14);
   scene.add(rimLight);
 
   // 5. Dual Overhead Workshop Spotlights: Direct illumination over input and output gears
-  inputGearGlow = new THREE.PointLight(0xfff2e0, 2.8, 22, 1.1);
+  inputGearGlow = new THREE.PointLight(0xfff4e6, 2.8, 22, 1.1);
   inputGearGlow.position.set(-1.0, 8.5, -2.4);
   scene.add(inputGearGlow);
 
-  outputGearGlow = new THREE.PointLight(0xeef4ff, 2.8, 22, 1.1);
+  outputGearGlow = new THREE.PointLight(0xf0f6ff, 2.8, 22, 1.1);
   outputGearGlow.position.set(1.0, 8.5, 2.4);
   scene.add(outputGearGlow);
 
-  // 6. Warm Gray Concrete Workshop Floor Plane (Natural floor with subtle expansion joints)
+  // 6. Warm Gray Concrete Workshop Floor Plane (Natural floor without technical CAD grid)
   const floorGeometry = new THREE.PlaneGeometry(80, 80);
   const floorMaterial = new THREE.MeshStandardMaterial({
-    color: 0x444e5c, // Warm industrial gray concrete
-    roughness: 0.86,
-    metalness: 0.06,
+    color: 0x4a5462, // Warm industrial gray concrete
+    roughness: 0.84,
+    metalness: 0.08,
   });
   const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
   floorMesh.rotation.x = -Math.PI / 2;
   floorMesh.position.y = 0;
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
-
-  // Subtle concrete slab saw-cut expansion joints
-  const seamMat = new THREE.MeshStandardMaterial({
-    color: 0x323a46,
-    roughness: 0.95,
-    metalness: 0.02,
-  });
-  const seamXPositions = [-14, 0, 14];
-  for (const sx of seamXPositions) {
-    const seamX = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 80), seamMat);
-    seamX.rotation.x = -Math.PI / 2;
-    seamX.position.set(sx, 0.002, 0);
-    seamX.receiveShadow = true;
-    scene.add(seamX);
-  }
-  const seamZPositions = [-10, 6, 22];
-  for (const sz of seamZPositions) {
-    const seamZ = new THREE.Mesh(new THREE.PlaneGeometry(80, 0.05), seamMat);
-    seamZ.rotation.x = -Math.PI / 2;
-    seamZ.position.set(0, 0.002, sz);
-    seamZ.receiveShadow = true;
-    scene.add(seamZ);
-  }
 
   // 7. 3D Industrial Factory Workshop Architecture (Strictly Background)
   const environmentGroup = createWorkshopEnvironment(scene);

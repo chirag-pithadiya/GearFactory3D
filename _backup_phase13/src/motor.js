@@ -21,13 +21,13 @@ export function createMotor(options = {}) {
   const {
     radius = 1.15,
     length = 2.4,
-    bodyColor = 0x17304c, // Classic deep industrial machine blue
-    endCoverColor = 0x102236,
-    flangeColor = 0x1f3854,
+    bodyColor = 0x1b3552, // Deep industrial machine blue
+    endCoverColor = 0x122338,
+    flangeColor = 0x223e60,
     shaftRadius = 0.28,
     shaftLength = 1.0,
-    metalness = 0.72,
-    roughness = 0.40,
+    metalness = 0.74,
+    roughness = 0.38,
     finCount = 16,
   } = options;
 
@@ -232,9 +232,9 @@ export function createMotor(options = {}) {
   const motorShaftGroup = new THREE.Group();
   const shaftGeo = new THREE.CylinderGeometry(shaftRadius, shaftRadius, shaftLength, 32);
   const shaftMat = new THREE.MeshStandardMaterial({
-    color: 0xa4b4c6,
+    color: 0x9ab0c4,
     metalness: 0.95,
-    roughness: 0.18,
+    roughness: 0.16,
   });
   const shaftMesh = new THREE.Mesh(shaftGeo, shaftMat);
   shaftMesh.rotation.z = Math.PI / 2;

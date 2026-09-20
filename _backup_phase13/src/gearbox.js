@@ -37,11 +37,11 @@ export function createGearboxCasing(options = {}) {
     widthX = 2.6,
     heightY = 6.4,
     depthZ = 7.2,
-    frameColor = 0x243b30, // Dark desaturated green / blue-green cast metal (classic machine enamel)
-    panelColor = 0xe8f4fc, // Optical inspection acrylic with subtle neutral tint
-    panelOpacity = 0.14,
-    metalness = 0.25,
-    roughness = 0.65,
+    frameColor = 0x274035, // Dark desaturated green cast metal (classic machine enamel)
+    panelColor = 0x9ec7eb, // Optical inspection acrylic
+    panelOpacity = 0.16,
+    metalness = 0.44,
+    roughness = 0.58,
   } = options;
 
   const casingGroup = new THREE.Group();
@@ -67,30 +67,30 @@ export function createGearboxCasing(options = {}) {
 
   // Darker recessed / structural cast iron
   const castDarkMat = new THREE.MeshStandardMaterial({
-    color: 0x1a2c22,
-    metalness: 0.22,
-    roughness: 0.72,
+    color: 0x1d3027,
+    metalness: 0.38,
+    roughness: 0.65,
   });
 
   // Precision machined surfaces (boss faces, seal retainers, split flange line)
   const machinedMat = new THREE.MeshStandardMaterial({
-    color: 0x647484,
-    metalness: 0.88,
+    color: 0x6e7e8c,
+    metalness: 0.90,
     roughness: 0.28,
   });
 
   // Dark metallic window bezel (gunmetal / nitrided steel)
   const bezelMat = new THREE.MeshStandardMaterial({
-    color: 0x1c2228,
-    metalness: 0.88,
-    roughness: 0.28,
+    color: 0x20272e,
+    metalness: 0.86,
+    roughness: 0.30,
   });
 
   // Zinc / chrome plated steel fasteners
   const boltMat = new THREE.MeshStandardMaterial({
-    color: 0x7c8c9c,
-    metalness: 0.90,
-    roughness: 0.28,
+    color: 0x8a97a8,
+    metalness: 0.92,
+    roughness: 0.26,
   });
   const hexBoltGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.10, 6);
 
@@ -99,8 +99,8 @@ export function createGearboxCasing(options = {}) {
     color: panelColor,
     transparent: true,
     opacity: panelOpacity,
-    roughness: 0.04,
-    metalness: 0.12,
+    roughness: 0.05,
+    metalness: 0.20,
     depthWrite: false,
     side: THREE.DoubleSide,
   });
@@ -943,22 +943,21 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
   });
   motor.position.set(motorX, shaftY, posZInput);
   scene.add(motor);
-  const motorShaft = motor.userData.shaftGroup;
-  // 9. Create Input Shaft (Polished turned steel)
+  const motorShaft = motor.userData.shaftGroup;  // 9. Create Input Shaft (Polished chrome steel)
   const inputShaftTotalLength = casingInternalWidthX + 1.4;
   const inputShaftCenterX = -0.7;
   const inputShaft = createShaft({
     radius: 0.32,
     length: inputShaftTotalLength,
-    color: 0xa4b4c6,
+    color: 0xe8f0f8,
     metalness: 0.95,
-    roughness: 0.18,
+    roughness: 0.15,
     hasCoupling: true,
   });
   inputShaft.position.set(inputShaftCenterX, shaftY, posZInput);
   scene.add(inputShaft);
 
-  // 10. Create Input Gear (Hardened alloy gear steel, CW) or Slot Locator Ring
+  // 10. Create Input Gear (High-clarity precision machined steel, CW) or Slot Locator Ring
   let inputGear = null;
   let inputSlotMarker = null;
   let inputDirectionArrow = null;
@@ -968,9 +967,9 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.42,
-      color: 0x9eb0c2, // Hardened alloy gear steel
-      metalness: 0.88,
-      roughness: 0.28,
+      color: 0xd8e4f0, // Polished high-clarity mechanical steel
+      metalness: 0.92,
+      roughness: 0.20,
     });
     inputGear.position.set(0, shaftY, posZInput);
     scene.add(inputGear);
@@ -996,7 +995,7 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
     scene.add(inputSlotMarker);
   }
 
-  // 11. Create Output Gear (Hardened alloy gear steel, CCW) or Slot Locator Ring
+  // 11. Create Output Gear (High-clarity precision machined steel, CCW) or Slot Locator Ring
   let outputGear = null;
   let outputSlotMarker = null;
   let outputDirectionArrow = null;
@@ -1007,9 +1006,9 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.50,
-      color: 0x98a8ba, // Hardened alloy gear steel
-      metalness: 0.88,
-      roughness: 0.28,
+      color: 0xd0dce8, // Polished high-clarity mechanical steel
+      metalness: 0.92,
+      roughness: 0.22,
     });
     outputGear.position.set(0, shaftY, posZOutput);
     scene.add(outputGear);

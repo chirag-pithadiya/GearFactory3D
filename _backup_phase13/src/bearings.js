@@ -29,11 +29,11 @@ export function createBallBearing(options = {}) {
     innerRadius = 2.5,
     width = 2.0,
     ballCount = 10,
-    outerColor = 0x34404e, // Hardened bearing alloy outer raceway
-    innerColor = 0xb8c8d8, // Precision ground mirror-smooth inner ring
-    ballColor = 0xf4f8fc, // Mirror chrome bearing spheres
+    outerColor = 0x4b5868, // Hardened bearing alloy outer raceway
+    innerColor = 0xd0dce8, // Precision ground mirror-smooth inner ring
+    ballColor = 0xf8fafc, // Mirror chrome bearing spheres
     metalness = 0.96,
-    roughness = 0.14,
+    roughness = 0.16,
   } = options;
 
   const bearingGroup = new THREE.Group();
@@ -66,8 +66,8 @@ export function createBallBearing(options = {}) {
 
   const outerMat = new THREE.MeshStandardMaterial({
     color: outerColor,
-    metalness: 0.90,
-    roughness: 0.35,
+    metalness: 0.92,
+    roughness: 0.24,
   });
   const outerRingMesh = new THREE.Mesh(outerGeom, outerMat);
   outerRingMesh.castShadow = true;

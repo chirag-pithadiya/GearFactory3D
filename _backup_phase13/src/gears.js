@@ -34,9 +34,9 @@ export function createSpurGear(options = {}) {
     thickness = 0.65,
     boreRadius = 0.42,
     pressureAngleDeg = 20,
-    color = 0x9eb0c2, // Hardened machined alloy gear steel
-    metalness = 0.88,
-    roughness = 0.28,
+    color = 0x8a95a5,
+    metalness = 0.92,
+    roughness = 0.26,
   } = options;
 
   // Involute Gear Mathematics:

@@ -19,9 +19,9 @@ export function createShaft(options = {}) {
   const {
     radius = 0.28,
     length = 2.0,
-    color = 0xa4b4c6, // Precision ground turned steel
-    metalness = 0.95,
-    roughness = 0.18,
+    color = 0x96a5b5, // Precision ground turned steel
+    metalness = 0.96,
+    roughness = 0.16,
     hasCoupling = false,
     couplingRadius = 0.44,
     couplingLength = 0.52,

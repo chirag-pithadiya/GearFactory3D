@@ -1310,9 +1310,9 @@ function createSpurGear(options = {}) {
     thickness = 0.65,
     boreRadius = 0.42,
     pressureAngleDeg = 20,
-    color = 0x8a95a5,
-    metalness = 0.92,
-    roughness = 0.26,
+    color = 0x9eb0c2, // Hardened machined alloy gear steel
+    metalness = 0.88,
+    roughness = 0.28,
   } = options;
 
   // Involute Gear Mathematics:
@@ -1544,13 +1544,13 @@ function createMotor(options = {}) {
   const {
     radius = 1.15,
     length = 2.4,
-    bodyColor = 0x1b3552, // Deep industrial machine blue
-    endCoverColor = 0x122338,
-    flangeColor = 0x223e60,
+    bodyColor = 0x17304c, // Classic deep industrial machine blue
+    endCoverColor = 0x102236,
+    flangeColor = 0x1f3854,
     shaftRadius = 0.28,
     shaftLength = 1.0,
-    metalness = 0.74,
-    roughness = 0.38,
+    metalness = 0.72,
+    roughness = 0.40,
     finCount = 16,
   } = options;
 
@@ -1755,9 +1755,9 @@ function createMotor(options = {}) {
   const motorShaftGroup = new THREE.Group();
   const shaftGeo = new THREE.CylinderGeometry(shaftRadius, shaftRadius, shaftLength, 32);
   const shaftMat = new THREE.MeshStandardMaterial({
-    color: 0x9ab0c4,
+    color: 0xa4b4c6,
     metalness: 0.95,
-    roughness: 0.16,
+    roughness: 0.18,
   });
   const shaftMesh = new THREE.Mesh(shaftGeo, shaftMat);
   shaftMesh.rotation.z = Math.PI / 2;
@@ -1816,11 +1816,11 @@ function createBallBearing(options = {}) {
     innerRadius = 2.5,
     width = 2.0,
     ballCount = 10,
-    outerColor = 0x4b5868, // Hardened bearing alloy outer raceway
-    innerColor = 0xd0dce8, // Precision ground mirror-smooth inner ring
-    ballColor = 0xf8fafc, // Mirror chrome bearing spheres
+    outerColor = 0x34404e, // Hardened bearing alloy outer raceway
+    innerColor = 0xb8c8d8, // Precision ground mirror-smooth inner ring
+    ballColor = 0xf4f8fc, // Mirror chrome bearing spheres
     metalness = 0.96,
-    roughness = 0.16,
+    roughness = 0.14,
   } = options;
 
   const bearingGroup = new THREE.Group();
@@ -1853,8 +1853,8 @@ function createBallBearing(options = {}) {
 
   const outerMat = new THREE.MeshStandardMaterial({
     color: outerColor,
-    metalness: 0.92,
-    roughness: 0.24,
+    metalness: 0.90,
+    roughness: 0.35,
   });
   const outerRingMesh = new THREE.Mesh(outerGeom, outerMat);
   outerRingMesh.castShadow = true;
@@ -2201,9 +2201,9 @@ function createShaft(options = {}) {
   const {
     radius = 0.28,
     length = 2.0,
-    color = 0x96a5b5, // Precision ground turned steel
-    metalness = 0.96,
-    roughness = 0.16,
+    color = 0xa4b4c6, // Precision ground turned steel
+    metalness = 0.95,
+    roughness = 0.18,
     hasCoupling = false,
     couplingRadius = 0.44,
     couplingLength = 0.52,
@@ -2508,11 +2508,11 @@ function createWorkshopEnvironment(scene) {
  */
 function setupLighting(scene) {
   // 1. Ambient Light: Clear, warm-neutral workshop fill ensuring zero pitch-black areas
-  const ambientLight = new THREE.AmbientLight(0xf0f4f8, 1.65);
+  const ambientLight = new THREE.AmbientLight(0xe8eef5, 1.45);
   scene.add(ambientLight);
 
   // 2. Warm Key Directional Light: Warm high-angle industrial work lamp
-  const keyLight = new THREE.DirectionalLight(0xfff2dc, 3.0);
+  const keyLight = new THREE.DirectionalLight(0xfff0d8, 2.85);
   keyLight.position.set(10, 20, 14);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.width = 2048;
@@ -2527,36 +2527,59 @@ function setupLighting(scene) {
   scene.add(keyLight);
 
   // 3. Cool Neutral Fill Light: Soft bounce from open factory bay
-  const frontFillLight = new THREE.DirectionalLight(0xd6e6f6, 1.85);
+  const frontFillLight = new THREE.DirectionalLight(0xd2e2f2, 1.75);
   frontFillLight.position.set(-10, 14, 14);
   scene.add(frontFillLight);
 
   // 4. Rim / Edge Light: Crisp metallic highlights on gear teeth and polished shafts
-  const rimLight = new THREE.DirectionalLight(0xb8d4f0, 2.2);
+  const rimLight = new THREE.DirectionalLight(0xbad2eb, 2.10);
   rimLight.position.set(-14, 14, -14);
   scene.add(rimLight);
 
   // 5. Dual Overhead Workshop Spotlights: Direct illumination over input and output gears
-  inputGearGlow = new THREE.PointLight(0xfff4e6, 2.8, 22, 1.1);
+  inputGearGlow = new THREE.PointLight(0xfff2e0, 2.8, 22, 1.1);
   inputGearGlow.position.set(-1.0, 8.5, -2.4);
   scene.add(inputGearGlow);
 
-  outputGearGlow = new THREE.PointLight(0xf0f6ff, 2.8, 22, 1.1);
+  outputGearGlow = new THREE.PointLight(0xeef4ff, 2.8, 22, 1.1);
   outputGearGlow.position.set(1.0, 8.5, 2.4);
   scene.add(outputGearGlow);
 
-  // 6. Warm Gray Concrete Workshop Floor Plane (Natural floor without technical CAD grid)
+  // 6. Warm Gray Concrete Workshop Floor Plane (Natural floor with subtle expansion joints)
   const floorGeometry = new THREE.PlaneGeometry(80, 80);
   const floorMaterial = new THREE.MeshStandardMaterial({
-    color: 0x4a5462, // Warm industrial gray concrete
-    roughness: 0.84,
-    metalness: 0.08,
+    color: 0x444e5c, // Warm industrial gray concrete
+    roughness: 0.86,
+    metalness: 0.06,
   });
   const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
   floorMesh.rotation.x = -Math.PI / 2;
   floorMesh.position.y = 0;
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
+
+  // Subtle concrete slab saw-cut expansion joints
+  const seamMat = new THREE.MeshStandardMaterial({
+    color: 0x323a46,
+    roughness: 0.95,
+    metalness: 0.02,
+  });
+  const seamXPositions = [-14, 0, 14];
+  for (const sx of seamXPositions) {
+    const seamX = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 80), seamMat);
+    seamX.rotation.x = -Math.PI / 2;
+    seamX.position.set(sx, 0.002, 0);
+    seamX.receiveShadow = true;
+    scene.add(seamX);
+  }
+  const seamZPositions = [-10, 6, 22];
+  for (const sz of seamZPositions) {
+    const seamZ = new THREE.Mesh(new THREE.PlaneGeometry(80, 0.05), seamMat);
+    seamZ.rotation.x = -Math.PI / 2;
+    seamZ.position.set(0, 0.002, sz);
+    seamZ.receiveShadow = true;
+    scene.add(seamZ);
+  }
 
   // 7. 3D Industrial Factory Workshop Architecture (Strictly Background)
   const environmentGroup = createWorkshopEnvironment(scene);
@@ -2667,8 +2690,8 @@ function resetControls() {
 
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x3c4654);
-scene.fog = new THREE.Fog(0x3c4654, 35, 95);
+scene.background = new THREE.Color(0x384250);
+scene.fog = new THREE.Fog(0x384250, 42, 98);
 
 let rendererInstance = null;
 
@@ -2779,11 +2802,11 @@ function createGearboxCasing(options = {}) {
     widthX = 2.6,
     heightY = 6.4,
     depthZ = 7.2,
-    frameColor = 0x274035, // Dark desaturated green cast metal (classic machine enamel)
-    panelColor = 0x9ec7eb, // Optical inspection acrylic
-    panelOpacity = 0.16,
-    metalness = 0.44,
-    roughness = 0.58,
+    frameColor = 0x243b30, // Dark desaturated green / blue-green cast metal (classic machine enamel)
+    panelColor = 0xe8f4fc, // Optical inspection acrylic with subtle neutral tint
+    panelOpacity = 0.14,
+    metalness = 0.25,
+    roughness = 0.65,
   } = options;
 
   const casingGroup = new THREE.Group();
@@ -2809,30 +2832,30 @@ function createGearboxCasing(options = {}) {
 
   // Darker recessed / structural cast iron
   const castDarkMat = new THREE.MeshStandardMaterial({
-    color: 0x1d3027,
-    metalness: 0.38,
-    roughness: 0.65,
+    color: 0x1a2c22,
+    metalness: 0.22,
+    roughness: 0.72,
   });
 
   // Precision machined surfaces (boss faces, seal retainers, split flange line)
   const machinedMat = new THREE.MeshStandardMaterial({
-    color: 0x6e7e8c,
-    metalness: 0.90,
+    color: 0x647484,
+    metalness: 0.88,
     roughness: 0.28,
   });
 
   // Dark metallic window bezel (gunmetal / nitrided steel)
   const bezelMat = new THREE.MeshStandardMaterial({
-    color: 0x20272e,
-    metalness: 0.86,
-    roughness: 0.30,
+    color: 0x1c2228,
+    metalness: 0.88,
+    roughness: 0.28,
   });
 
   // Zinc / chrome plated steel fasteners
   const boltMat = new THREE.MeshStandardMaterial({
-    color: 0x8a97a8,
-    metalness: 0.92,
-    roughness: 0.26,
+    color: 0x7c8c9c,
+    metalness: 0.90,
+    roughness: 0.28,
   });
   const hexBoltGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.10, 6);
 
@@ -2841,8 +2864,8 @@ function createGearboxCasing(options = {}) {
     color: panelColor,
     transparent: true,
     opacity: panelOpacity,
-    roughness: 0.05,
-    metalness: 0.20,
+    roughness: 0.04,
+    metalness: 0.12,
     depthWrite: false,
     side: THREE.DoubleSide,
   });
@@ -3685,21 +3708,22 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
   });
   motor.position.set(motorX, shaftY, posZInput);
   scene.add(motor);
-  const motorShaft = motor.userData.shaftGroup;  // 9. Create Input Shaft (Polished chrome steel)
+  const motorShaft = motor.userData.shaftGroup;
+  // 9. Create Input Shaft (Polished turned steel)
   const inputShaftTotalLength = casingInternalWidthX + 1.4;
   const inputShaftCenterX = -0.7;
   const inputShaft = createShaft({
     radius: 0.32,
     length: inputShaftTotalLength,
-    color: 0xe8f0f8,
+    color: 0xa4b4c6,
     metalness: 0.95,
-    roughness: 0.15,
+    roughness: 0.18,
     hasCoupling: true,
   });
   inputShaft.position.set(inputShaftCenterX, shaftY, posZInput);
   scene.add(inputShaft);
 
-  // 10. Create Input Gear (High-clarity precision machined steel, CW) or Slot Locator Ring
+  // 10. Create Input Gear (Hardened alloy gear steel, CW) or Slot Locator Ring
   let inputGear = null;
   let inputSlotMarker = null;
   let inputDirectionArrow = null;
@@ -3709,9 +3733,9 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.42,
-      color: 0xd8e4f0, // Polished high-clarity mechanical steel
-      metalness: 0.92,
-      roughness: 0.20,
+      color: 0x9eb0c2, // Hardened alloy gear steel
+      metalness: 0.88,
+      roughness: 0.28,
     });
     inputGear.position.set(0, shaftY, posZInput);
     scene.add(inputGear);
@@ -3737,7 +3761,7 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
     scene.add(inputSlotMarker);
   }
 
-  // 11. Create Output Gear (High-clarity precision machined steel, CCW) or Slot Locator Ring
+  // 11. Create Output Gear (Hardened alloy gear steel, CCW) or Slot Locator Ring
   let outputGear = null;
   let outputSlotMarker = null;
   let outputDirectionArrow = null;
@@ -3748,9 +3772,9 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.50,
-      color: 0xd0dce8, // Polished high-clarity mechanical steel
-      metalness: 0.92,
-      roughness: 0.22,
+      color: 0x98a8ba, // Hardened alloy gear steel
+      metalness: 0.88,
+      roughness: 0.28,
     });
     outputGear.position.set(0, shaftY, posZOutput);
     scene.add(outputGear);
