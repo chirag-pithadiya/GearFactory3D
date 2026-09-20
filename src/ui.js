@@ -674,6 +674,9 @@ export function renderAvailableGears(availableGears = [10, 20, 30, 40, 50, 60]) 
  */
 export function openLevelSelectModal() {
   closeLevelIntro();
+  closeWelcomeModal();
+  closeLevelComplete();
+  closePauseModal();
   if (elements.levelSelectModal) {
     elements.levelSelectModal.style.display = 'flex';
   }
@@ -694,10 +697,58 @@ export function renderLevelSelectModal(levels, completedList = [], highestUnlock
     { name: 'INTERMEDIATE', range: 'Levels 6–10', badgeClass: 'badge-medium', start: 6, end: 10 },
     { name: 'HARD', range: 'Levels 11–15', badgeClass: 'badge-hard', start: 11, end: 15 },
     { name: 'EXPERT', range: 'Levels 16–20', badgeClass: 'badge-expert', start: 16, end: 20 },
-    { name: 'HARD', range: 'Levels 21–30', badgeClass: 'badge-hard', start: 21, end: 30 },
+    { name: 'CHALLENGE', range: 'Levels 21–30', badgeClass: 'badge-hard', start: 21, end: 30 },
     { name: 'ADVANCED', range: 'Levels 31–40', badgeClass: 'badge-advanced', start: 31, end: 40 },
     { name: 'EXPERT', range: 'Levels 41–50', badgeClass: 'badge-expert', start: 41, end: 50 },
+    { name: 'BEGINNER+', range: 'Levels 51–60', badgeClass: 'badge-easy', start: 51, end: 60 },
+    { name: 'INTERMEDIATE', range: 'Levels 61–70', badgeClass: 'badge-medium', start: 61, end: 70 },
+    { name: 'ADVANCED', range: 'Levels 71–80', badgeClass: 'badge-advanced', start: 71, end: 80 },
+    { name: 'MASTER', range: 'Levels 81–90', badgeClass: 'badge-hard', start: 81, end: 90 },
+    { name: 'GRANDMASTER', range: 'Levels 91–100', badgeClass: 'badge-expert', start: 91, end: 100 },
   ];
+
+  const chapters = [
+    { label: 'ALL (1–100)', min: 1, max: 100 },
+    { label: '1–25', min: 1, max: 25 },
+    { label: '26–50', min: 26, max: 50 },
+    { label: '51–75', min: 51, max: 75 },
+    { label: '76–100', min: 76, max: 100 },
+  ];
+
+  // Determine initial chapter based on currentLevel
+  let selectedChapter = chapters[0];
+  if (currentLevel > 75) selectedChapter = chapters[4];
+  else if (currentLevel > 50) selectedChapter = chapters[3];
+  else if (currentLevel > 25) selectedChapter = chapters[2];
+
+  // Quick navigation tabs
+  const tabsContainer = document.createElement('div');
+  tabsContainer.className = 'level-select-tabs';
+
+  const tierElements = [];
+
+  const updateVisibility = (chap) => {
+    tierElements.forEach(({ section, tierStart, tierEnd }) => {
+      const isVisible = (tierStart <= chap.max && tierEnd >= chap.min);
+      section.style.display = isVisible ? 'block' : 'none';
+    });
+  };
+
+  chapters.forEach((chap) => {
+    const tabBtn = document.createElement('button');
+    tabBtn.type = 'button';
+    tabBtn.className = `level-tab-btn ${chap === selectedChapter ? 'active' : ''}`;
+    tabBtn.textContent = chap.label;
+    tabBtn.addEventListener('click', () => {
+      tabsContainer.querySelectorAll('.level-tab-btn').forEach(b => b.classList.remove('active'));
+      tabBtn.classList.add('active');
+      selectedChapter = chap;
+      updateVisibility(chap);
+    });
+    tabsContainer.appendChild(tabBtn);
+  });
+
+  elements.levelSelectGrid.appendChild(tabsContainer);
 
   tiers.forEach((tier) => {
     const tierSection = document.createElement('div');
@@ -728,9 +779,10 @@ export function renderLevelSelectModal(levels, completedList = [], highestUnlock
       btn.title = isUnlocked ? `Play Level ${lNum}` : `Level ${lNum} Locked`;
 
       let statusText = isCompleted ? '✓ Done' : (isUnlocked ? 'Play' : '🔒');
+      const formattedNum = lNum < 10 ? `0${lNum}` : `${lNum}`;
 
       btn.innerHTML = `
-        <span class="level-tile-num">${lNum}</span>
+        <span class="level-tile-num">${formattedNum}</span>
         <span class="level-tile-status">${statusText}</span>
       `;
 
@@ -746,7 +798,11 @@ export function renderLevelSelectModal(levels, completedList = [], highestUnlock
 
     tierSection.appendChild(grid);
     elements.levelSelectGrid.appendChild(tierSection);
+    tierElements.push({ section: tierSection, tierStart: tier.start, tierEnd: tier.end });
   });
+
+  // Apply default chapter filter
+  updateVisibility(selectedChapter);
 }
 
 export function openMainMenu() {

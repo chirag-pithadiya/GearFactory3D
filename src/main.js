@@ -1194,6 +1194,8 @@ window.gearFactory = {
   kinetics,
   recalculateKinetics,
   validateLevels,
+  getLevel,
+  getTotalLevels,
   getCompletedLevels,
   getHighestUnlockedLevel,
   setHighestUnlockedLevel,

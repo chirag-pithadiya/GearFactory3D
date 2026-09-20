@@ -2524,6 +2524,44 @@ html, body {
   gap: 14px;
 }
 
+.level-select-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #0d1320;
+  padding: 4px 0 8px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.level-tab-btn {
+  background: #111827;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 6px;
+  padding: 5px 10px;
+  color: #94a3b8;
+  font-family: var(--font-display);
+  font-size: 0.70rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.level-tab-btn:hover {
+  border-color: #38bdf8;
+  color: #f1f5f9;
+}
+
+.level-tab-btn.active {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
 .tier-section {
   background: #111827;
   border: 1px solid rgba(148, 163, 184, 0.16);
