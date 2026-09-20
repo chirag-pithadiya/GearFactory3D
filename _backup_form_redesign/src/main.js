@@ -19,7 +19,7 @@
 
 import * as THREE from 'three';
 import { scene, initRenderer, render, getRenderer } from './scene.js';
-import { camera, updateCameraAspect, resetCamera, defaultCameraPos, defaultTargetPos } from './camera.js';
+import { camera, updateCameraAspect, resetCamera } from './camera.js';
 import { setupLighting } from './lighting.js';
 import { initControls, updateControls, resetControls, getControls } from './controls.js';
 import {
@@ -137,8 +137,8 @@ setupLighting(scene);
 const controls = initControls(camera, renderer.domElement);
 
 // Ensure camera is cleanly framed on the complete industrial machine
-camera.position.copy(defaultCameraPos);
-controls.target.copy(defaultTargetPos);
+camera.position.set(-12.5, 8.8, 19.0);
+controls.target.set(0.0, 5.2, 0.0);
 controls.update();
 
 // Assembly reference holder

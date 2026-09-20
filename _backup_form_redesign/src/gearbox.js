@@ -35,30 +35,25 @@ import { updateGlowPositions } from './lighting.js';
 export function createGearboxCasing(options = {}) {
   const {
     widthX = 2.6,
-    heightY = 7.0,
-    depthZ = 11.5,
+    heightY = 6.4,
+    depthZ = 7.2,
     frameColor = 0x243b30, // Dark desaturated green / blue-green cast metal (classic machine enamel)
     panelColor = 0xe8f4fc, // Optical inspection acrylic with subtle neutral tint
-    panelOpacity = 0.12,
+    panelOpacity = 0.14,
     metalness = 0.25,
     roughness = 0.65,
   } = options;
 
   const casingGroup = new THREE.Group();
-  const shaftY = options.shaftY || 4.2;
+  const shaftY = options.shaftY || 3.6;
   const inputZ = options.inputZ !== undefined ? options.inputZ : -2.4;
   const outputZ = options.outputZ !== undefined ? options.outputZ : 2.4;
 
-  const wallThick = 0.32;
+  const wallThick = 0.36;
   const halfW = widthX * 0.5;
   const halfD = depthZ * 0.5;
-  const sumpH = 1.05;
+  const sumpH = 1.35;
   const casingTopY = heightY;
-
-  // External overall dimensions
-  const extW = widthX + wallThick * 2;
-  const extD = depthZ + wallThick * 2;
-  const extH = casingTopY;
 
   // --------------------------------------------------------------------------
   // Core Industrial Materials
@@ -77,7 +72,7 @@ export function createGearboxCasing(options = {}) {
     roughness: 0.72,
   });
 
-  // Precision machined surfaces (split flange line, boss faces, seal retainers)
+  // Precision machined surfaces (boss faces, seal retainers, split flange line)
   const machinedMat = new THREE.MeshStandardMaterial({
     color: 0x647484,
     metalness: 0.88,
@@ -134,8 +129,11 @@ export function createGearboxCasing(options = {}) {
   // --------------------------------------------------------------------------
   // 1. Lower Machine Bed / Oil Sump Housing & Mounting Feet
   // --------------------------------------------------------------------------
-  // Solid cast machine base bed (resting solidly on factory floor at Y = 0)
-  const sumpGeo = new THREE.BoxGeometry(extW + 0.12, sumpH, extD + 0.12);
+  const baseW = widthX + wallThick * 2 + 0.30;
+  const baseD = depthZ + wallThick * 2 + 0.30;
+
+  // Solid cast machine base block (sitting solidly on factory floor at Y = 0)
+  const sumpGeo = new THREE.BoxGeometry(baseW, sumpH, baseD);
   const sumpMesh = new THREE.Mesh(sumpGeo, castMat);
   sumpMesh.position.set(0, sumpH * 0.5, 0);
   sumpMesh.castShadow = true;
@@ -143,24 +141,24 @@ export function createGearboxCasing(options = {}) {
   casingGroup.add(sumpMesh);
 
   // Lower flared skirting flange
-  const skirtH = 0.28;
-  const skirtGeo = new THREE.BoxGeometry(extW + 0.44, skirtH, extD + 0.44);
+  const skirtH = 0.32;
+  const skirtGeo = new THREE.BoxGeometry(baseW + 0.45, skirtH, baseD + 0.45);
   const skirtMesh = new THREE.Mesh(skirtGeo, castDarkMat);
   skirtMesh.position.set(0, skirtH * 0.5, 0);
   skirtMesh.castShadow = true;
   skirtMesh.receiveShadow = true;
   casingGroup.add(skirtMesh);
 
-  // Four Heavy Cast Corner Mounting Feet with foundation anchor bolts
-  const footW = 0.72;
-  const footH = 0.26;
-  const footD = 0.72;
+  // Four Heavy Cast Mounting Feet with foundation anchor bolts
+  const footW = 0.78;
+  const footH = 0.28;
+  const footD = 0.78;
   const footGeo = new THREE.BoxGeometry(footW, footH, footD);
-  const anchorBoltGeo = new THREE.CylinderGeometry(0.075, 0.075, footH + 0.16, 16);
-  const washerGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.04, 16);
+  const anchorBoltGeo = new THREE.CylinderGeometry(0.08, 0.08, footH + 0.16, 16);
+  const washerGeo = new THREE.CylinderGeometry(0.15, 0.15, 0.04, 16);
 
-  const footXPos = [-extW * 0.5 - footW * 0.22, extW * 0.5 + footW * 0.22];
-  const footZPos = [-extD * 0.5 + footD * 0.35, extD * 0.5 - footD * 0.35];
+  const footXPos = [-baseW * 0.5 - footW * 0.30, baseW * 0.5 + footW * 0.30];
+  const footZPos = [-baseD * 0.5 + footD * 0.40, baseD * 0.5 - footD * 0.40];
 
   for (const fx of footXPos) {
     for (const fz of footZPos) {
@@ -172,9 +170,9 @@ export function createGearboxCasing(options = {}) {
       casingGroup.add(foot);
 
       // Foot vertical reinforcing gusset
-      const gussetGeo = new THREE.BoxGeometry(0.12, sumpH * 0.65, 0.32);
+      const gussetGeo = new THREE.BoxGeometry(0.12, sumpH * 0.70, 0.35);
       const gusset = new THREE.Mesh(gussetGeo, castMat);
-      const gussetX = fx > 0 ? fx - footW * 0.32 : fx + footW * 0.32;
+      const gussetX = fx > 0 ? fx - footW * 0.35 : fx + footW * 0.35;
       gusset.position.set(gussetX, sumpH * 0.40, fz);
       casingGroup.add(gusset);
 
@@ -190,276 +188,248 @@ export function createGearboxCasing(options = {}) {
     }
   }
 
-  // Oil Level Sight Glass on Front Sump Face (below window)
-  const sightX = -halfW - wallThick - 0.08;
-  const sightZ = (inputZ + outputZ) * 0.5 + 0.65;
+  // Oil Level Sight Glass on Front Sump Face
+  const sightZ = halfD + wallThick + 0.16;
   const sightBase = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.18, 0.18, 0.08, 20),
+    new THREE.CylinderGeometry(0.20, 0.20, 0.08, 20),
     brassMat
   );
-  sightBase.rotation.z = Math.PI / 2;
-  sightBase.position.set(sightX, sumpH * 0.65, sightZ);
+  sightBase.rotation.x = Math.PI / 2;
+  sightBase.position.set(halfW * 0.35, sumpH * 0.65, sightZ);
   casingGroup.add(sightBase);
 
   const sightWindow = new THREE.Mesh(
-    new THREE.CircleGeometry(0.12, 20),
+    new THREE.CircleGeometry(0.13, 20),
     oilMat
   );
-  sightWindow.rotation.y = -Math.PI / 2;
-  sightWindow.position.set(sightX - 0.045, sumpH * 0.65, sightZ);
+  sightWindow.position.set(halfW * 0.35, sumpH * 0.65, sightZ + 0.045);
   casingGroup.add(sightWindow);
 
   // Magnetic Oil Drain Plug on Lower Front
   const drainPlug = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.12, 0.12, 0.10, 6),
+    new THREE.CylinderGeometry(0.13, 0.13, 0.12, 6),
     boltMat
   );
-  drainPlug.rotation.z = Math.PI / 2;
-  drainPlug.position.set(sightX, 0.35, (inputZ + outputZ) * 0.5 - 0.65);
+  drainPlug.rotation.x = Math.PI / 2;
+  drainPlug.position.set(-halfW * 0.35, 0.35, sightZ);
   casingGroup.add(drainPlug);
 
   // --------------------------------------------------------------------------
-  // 2. Horizontal Split Parting Line Flange (Shaft Centerline Y = shaftY)
+  // 2. Solid Rear Housing Wall with Structural Stiffener Ribs
   // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // 2. Horizontal Split Parting Line Flange (Shaft Centerline Y = shaftY)
-  // --------------------------------------------------------------------------
-  const partFlangeH = 0.16;
+  const backWallH = casingTopY - sumpH;
+  const backWallGeo = new THREE.BoxGeometry(widthX + wallThick * 2, backWallH, wallThick);
+  const backWallMesh = new THREE.Mesh(backWallGeo, castMat);
+  backWallMesh.position.set(0, sumpH + backWallH * 0.5, -halfD - wallThick * 0.5);
+  backWallMesh.castShadow = true;
+  backWallMesh.receiveShadow = true;
+  casingGroup.add(backWallMesh);
 
-  // Rear full continuous parting rail
-  const pRailBack = new THREE.Mesh(new THREE.BoxGeometry(0.14, partFlangeH, extD + 0.20), machinedMat);
-  pRailBack.position.set(halfW + wallThick + 0.07, shaftY, 0);
-  casingGroup.add(pRailBack);
+  // Vertical structural reinforcing ribs on rear casting
+  const ribZ = -halfD - wallThick - 0.06;
+  const vRibGeo = new THREE.BoxGeometry(0.18, backWallH - 0.40, 0.12);
+  const ribXs = [-halfW * 0.65, 0, halfW * 0.65];
+  for (const rx of ribXs) {
+    const vRib = new THREE.Mesh(vRibGeo, castDarkMat);
+    vRib.position.set(rx, sumpH + backWallH * 0.5, ribZ);
+    vRib.castShadow = true;
+    casingGroup.add(vRib);
+  }
+
+  // Industrial specification / rating plate with corner rivets
+  const nameplateGeo = new THREE.BoxGeometry(Math.min(widthX * 0.55, 2.2), 0.75, 0.03);
+  const nameplateMat = new THREE.MeshStandardMaterial({
+    color: 0x485868,
+    metalness: 0.88,
+    roughness: 0.32,
+  });
+  const nameplateMesh = new THREE.Mesh(nameplateGeo, nameplateMat);
+  nameplateMesh.position.set(0, shaftY + 0.8, ribZ - 0.02);
+  casingGroup.add(nameplateMesh);
+
+  const npx = Math.min(widthX * 0.55, 2.2) * 0.42;
+  const npy = 0.75 * 0.38;
+  const plateRivets = [[-npx, -npy], [npx, -npy], [-npx, npy], [npx, npy]];
+  for (const [px, py] of plateRivets) {
+    const rivet = new THREE.Mesh(
+      new THREE.SphereGeometry(0.032, 8, 8),
+      boltMat
+    );
+    rivet.position.set(px, shaftY + 0.8 + py, ribZ - 0.04);
+    casingGroup.add(rivet);
+  }
 
   // --------------------------------------------------------------------------
-  // 3. Front Machine Face (-X side facing camera) with 50-60% INSPECTION WINDOW
+  // 3. Solid Left Housing Section & Input Bearing Housing Boss
   // --------------------------------------------------------------------------
   const sideWallH = casingTopY - sumpH;
-  const winCenterZ = (inputZ + outputZ) * 0.5;
+  const sideWallD = depthZ + wallThick * 2;
 
-  // Window opening dimensions: generously frames both gears without cutting off top or bottom teeth
-  const winTopMargin = 0.52;
-  const winMaxY = casingTopY - winTopMargin;
-  const winMinY = Math.max(sumpH + 0.35, shaftY - (casingTopY - shaftY) + 0.25);
-  const winH = winMaxY - winMinY;
+  // Solid Left Structural Bulkhead Frame (with authentic open viewing port into gears)
+  const leftApronH = Math.max(0.4, (shaftY - 1.25) - sumpH);
+  const leftApron = new THREE.Mesh(
+    new THREE.BoxGeometry(wallThick, leftApronH, sideWallD),
+    castMat
+  );
+  leftApron.position.set(-halfW - wallThick * 0.5, sumpH + leftApronH * 0.5, 0);
+  leftApron.castShadow = true;
+  leftApron.receiveShadow = true;
+  casingGroup.add(leftApron);
 
-  const winSideMargin = Math.max(1.5, extD * 0.18);
-  const winW = extD - winSideMargin * 2;
-  const winMinZ = winCenterZ - winW * 0.5;
-  const winMaxZ = winCenterZ + winW * 0.5;
+  const leftHeaderH = 0.80;
+  const leftHeader = new THREE.Mesh(
+    new THREE.BoxGeometry(wallThick, leftHeaderH, sideWallD),
+    castMat
+  );
+  leftHeader.position.set(-halfW - wallThick * 0.5, casingTopY - leftHeaderH * 0.5, 0);
+  leftHeader.castShadow = true;
+  leftHeader.receiveShadow = true;
+  casingGroup.add(leftHeader);
 
-  const frontX = -halfW - wallThick * 0.5;
+  // Left Rear Corner Pillar (behind input bearing boss)
+  const leftRearPillarD = Math.max(0.4, (inputZ - 0.95) - (-halfD - wallThick));
+  const leftMidH = casingTopY - leftHeaderH - (sumpH + leftApronH);
+  const leftMidY = (sumpH + leftApronH) + leftMidH * 0.5;
 
-  // Front Split Parting Rails (ONLY on solid bulkheads outside the window, never across the glass!)
-  const leftRailD = Math.max(0.1, winMinZ - (-halfD - wallThick));
-  if (leftRailD > 0.15) {
-    const pRailLeft = new THREE.Mesh(new THREE.BoxGeometry(0.14, partFlangeH, leftRailD), machinedMat);
-    pRailLeft.position.set(-halfW - wallThick - 0.07, shaftY, (-halfD - wallThick) + leftRailD * 0.5);
-    casingGroup.add(pRailLeft);
-  }
-  const rightRailD = Math.max(0.1, (halfD + wallThick) - winMaxZ);
-  if (rightRailD > 0.15) {
-    const pRailRight = new THREE.Mesh(new THREE.BoxGeometry(0.14, partFlangeH, rightRailD), machinedMat);
-    pRailRight.position.set(-halfW - wallThick - 0.07, shaftY, (halfD + wallThick) - rightRailD * 0.5);
-    casingGroup.add(pRailRight);
-  }
+  const leftRearPillar = new THREE.Mesh(
+    new THREE.BoxGeometry(wallThick, leftMidH, leftRearPillarD),
+    castMat
+  );
+  leftRearPillar.position.set(
+    -halfW - wallThick * 0.5,
+    leftMidY,
+    (-halfD - wallThick) + leftRearPillarD * 0.5
+  );
+  leftRearPillar.castShadow = true;
+  leftRearPillar.receiveShadow = true;
+  casingGroup.add(leftRearPillar);
 
-  // Parting line clamping hex bolts along split rails
-  const numSplitBolts = Math.max(4, Math.floor(extD / 1.6));
-  for (let i = 0; i < numSplitBolts; i++) {
-    const bz = -extD * 0.44 + (i / (numSplitBolts - 1)) * extD * 0.88;
-    // Rear bolts
-    const bBack = new THREE.Mesh(hexBoltGeo, boltMat);
-    bBack.position.set(halfW + wallThick + 0.14, shaftY + 0.04, bz);
-    casingGroup.add(bBack);
+  // Left Front Corner Pillar (in front of output blind boss)
+  const leftFrontPillarD = Math.max(0.4, (halfD + wallThick) - (outputZ + 0.95));
+  const leftFrontPillar = new THREE.Mesh(
+    new THREE.BoxGeometry(wallThick, leftMidH, leftFrontPillarD),
+    castMat
+  );
+  leftFrontPillar.position.set(
+    -halfW - wallThick * 0.5,
+    leftMidY,
+    (halfD + wallThick) - leftFrontPillarD * 0.5
+  );
+  leftFrontPillar.castShadow = true;
+  leftFrontPillar.receiveShadow = true;
+  casingGroup.add(leftFrontPillar);
 
-    // Front bolts only outside the window
-    if (bz < winMinZ - 0.2 || bz > winMaxZ + 0.2) {
-      const bFront = new THREE.Mesh(hexBoltGeo, boltMat);
-      bFront.position.set(-halfW - wallThick - 0.14, shaftY + 0.04, bz);
-      casingGroup.add(bFront);
-    }
-  }
-
-  // Front Left Solid Bulkhead (from left end to window)
-  const leftBulkheadD = winMinZ - (-halfD - wallThick);
-  if (leftBulkheadD > 0.1) {
-    const leftBulkhead = new THREE.Mesh(
-      new THREE.BoxGeometry(wallThick, sideWallH, leftBulkheadD),
-      castMat
-    );
-    leftBulkhead.position.set(frontX, sumpH + sideWallH * 0.5, (-halfD - wallThick) + leftBulkheadD * 0.5);
-    leftBulkhead.castShadow = true;
-    leftBulkhead.receiveShadow = true;
-    casingGroup.add(leftBulkhead);
-  }
-
-  // Front Right Solid Bulkhead (from window to right end)
-  const rightBulkheadD = (halfD + wallThick) - winMaxZ;
-  if (rightBulkheadD > 0.1) {
-    const rightBulkhead = new THREE.Mesh(
-      new THREE.BoxGeometry(wallThick, sideWallH, rightBulkheadD),
-      castMat
-    );
-    rightBulkhead.position.set(frontX, sumpH + sideWallH * 0.5, (halfD + wallThick) - rightBulkheadD * 0.5);
-    rightBulkhead.castShadow = true;
-    rightBulkhead.receiveShadow = true;
-    casingGroup.add(rightBulkhead);
-  }
-
-  // Front Lower Solid Apron (below the window, above the sump)
-  const apronH = winMinY - sumpH;
-  if (apronH > 0.1) {
-    const apron = new THREE.Mesh(
-      new THREE.BoxGeometry(wallThick, apronH, winW),
-      castMat
-    );
-    apron.position.set(frontX, sumpH + apronH * 0.5, winCenterZ);
-    apron.castShadow = true;
-    apron.receiveShadow = true;
-    casingGroup.add(apron);
-  }
-
-  // Front Upper Solid Header (above the window, below the top cover)
-  const headerH = casingTopY - winMaxY;
-  if (headerH > 0.1) {
-    const header = new THREE.Mesh(
-      new THREE.BoxGeometry(wallThick, headerH, winW),
-      castMat
-    );
-    header.position.set(frontX, casingTopY - headerH * 0.5, winCenterZ);
-    header.castShadow = true;
-    header.receiveShadow = true;
-    casingGroup.add(header);
-  }
-
-  // Front Bearing Boss: Input Shaft Pass-Through Housing (Motor Drive Side)
-  // Precision machined flanged collar around the input drive shaft entry
-  const bossRadius = 0.54;
-  const bossLength = 0.42;
-  const frontBossGeo = new THREE.CylinderGeometry(bossRadius, bossRadius + 0.05, bossLength, 28);
-  const frontBossMesh = new THREE.Mesh(frontBossGeo, castMat);
-  frontBossMesh.rotation.z = Math.PI / 2;
-  frontBossMesh.position.set(-halfW - wallThick - bossLength * 0.5, shaftY, inputZ);
-  frontBossMesh.castShadow = true;
-  frontBossMesh.receiveShadow = true;
-  casingGroup.add(frontBossMesh);
+  // Left Bearing Boss — Input Shaft Pass-Through Housing (Motor Drive Side)
+  const bossRadius = 0.94;
+  const bossLength = 0.48;
+  const leftBossGeo = new THREE.CylinderGeometry(bossRadius, bossRadius + 0.08, bossLength, 32);
+  const leftBossMesh = new THREE.Mesh(leftBossGeo, castMat);
+  leftBossMesh.rotation.z = Math.PI / 2;
+  leftBossMesh.position.set(-halfW - wallThick - bossLength * 0.5, shaftY, inputZ);
+  leftBossMesh.castShadow = true;
+  leftBossMesh.receiveShadow = true;
+  casingGroup.add(leftBossMesh);
 
   // Machined Bearing Retaining Flange Collar
-  const flangeCollar = new THREE.Mesh(
-    new THREE.CylinderGeometry(bossRadius + 0.12, bossRadius + 0.12, 0.08, 28),
-    machinedMat
-  );
+  const flangeCollarGeo = new THREE.CylinderGeometry(bossRadius + 0.18, bossRadius + 0.18, 0.10, 32);
+  const flangeCollar = new THREE.Mesh(flangeCollarGeo, machinedMat);
   flangeCollar.rotation.z = Math.PI / 2;
-  flangeCollar.position.set(-halfW - wallThick - bossLength + 0.04, shaftY, inputZ);
+  flangeCollar.position.set(-halfW - wallThick - bossLength + 0.05, shaftY, inputZ);
   flangeCollar.castShadow = true;
   casingGroup.add(flangeCollar);
 
-  // Rubber lip oil seal ring
-  const sealRing = new THREE.Mesh(
-    new THREE.TorusGeometry(0.34, 0.038, 12, 28),
-    sealMat
-  );
+  // Nitrile rubber oil lip seal ring surrounding input shaft
+  const sealRingGeo = new THREE.TorusGeometry(0.38, 0.05, 12, 28);
+  const sealRing = new THREE.Mesh(sealRingGeo, sealMat);
   sealRing.rotation.y = Math.PI / 2;
   sealRing.position.set(-halfW - wallThick - bossLength - 0.01, shaftY, inputZ);
   casingGroup.add(sealRing);
 
-  // 6 Radial Retaining Hex Bolts around Input Bearing Flange
-  const boltCircleR = bossRadius + 0.07;
+  // 6 Radial Retaining Hex Bolts around Input Flange
+  const boltCircleR = bossRadius + 0.08;
   for (let i = 0; i < 6; i++) {
     const angle = (i * Math.PI * 2) / 6;
     const by = Math.sin(angle) * boltCircleR;
     const bz = Math.cos(angle) * boltCircleR;
     const b = new THREE.Mesh(hexBoltGeo, boltMat);
     b.rotation.z = Math.PI / 2;
-    b.position.set(-halfW - wallThick - bossLength + 0.08, shaftY + by, inputZ + bz);
+    b.position.set(-halfW - wallThick - bossLength + 0.10, shaftY + by, inputZ + bz);
     b.castShadow = true;
     casingGroup.add(b);
   }
 
-  // --------------------------------------------------------------------------
-  // 4. Framed 50-60% Transparent Inspection Window
-  // --------------------------------------------------------------------------
-  const winX = -halfW - wallThick - 0.02;
-  const bezelThick = 0.12;
-  const bezelDepth = 0.08;
+  // Left Output Shaft Blind Bearing Hub (Dead-End Bearing Cover)
+  const blindBossGeo = new THREE.CylinderGeometry(0.86, 0.92, 0.32, 28);
+  const leftBlindBoss = new THREE.Mesh(blindBossGeo, castMat);
+  leftBlindBoss.rotation.z = Math.PI / 2;
+  leftBlindBoss.position.set(-halfW - wallThick - 0.16, shaftY, outputZ);
+  leftBlindBoss.castShadow = true;
+  casingGroup.add(leftBlindBoss);
 
-  // Dark Nitrided Steel Bezel Frame Bars
-  // Top Bezel Bar
-  const bTop = new THREE.Mesh(new THREE.BoxGeometry(bezelDepth, bezelThick, winW + bezelThick * 2), bezelMat);
-  bTop.position.set(winX - 0.02, winMaxY + bezelThick * 0.5, winCenterZ);
-  casingGroup.add(bTop);
+  // Blind cover end flange with bolts
+  const blindFlange = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.96, 0.96, 0.08, 28),
+    machinedMat
+  );
+  blindFlange.rotation.z = Math.PI / 2;
+  blindFlange.position.set(-halfW - wallThick - 0.32, shaftY, outputZ);
+  casingGroup.add(blindFlange);
 
-  // Bottom Bezel Bar
-  const bBot = new THREE.Mesh(new THREE.BoxGeometry(bezelDepth, bezelThick, winW + bezelThick * 2), bezelMat);
-  bBot.position.set(winX - 0.02, winMinY - bezelThick * 0.5, winCenterZ);
-  casingGroup.add(bBot);
-
-  // Left Bezel Bar
-  const bLeft = new THREE.Mesh(new THREE.BoxGeometry(bezelDepth, winH, bezelThick), bezelMat);
-  bLeft.position.set(winX - 0.02, shaftY, winMinZ - bezelThick * 0.5);
-  casingGroup.add(bLeft);
-
-  // Right Bezel Bar
-  const bRight = new THREE.Mesh(new THREE.BoxGeometry(bezelDepth, winH, bezelThick), bezelMat);
-  bRight.position.set(winX - 0.02, shaftY, winMaxZ + bezelThick * 0.5);
-  casingGroup.add(bRight);
-
-  // 8 Perimeter Hex Clamping Bolts around Window Frame
-  const frameBoltZ = [-winW * 0.35, 0, winW * 0.35];
-  for (const fz of frameBoltZ) {
-    const bT = new THREE.Mesh(hexBoltGeo, boltMat);
-    bT.rotation.z = Math.PI / 2;
-    bT.position.set(winX - 0.06, winMaxY + bezelThick * 0.5, winCenterZ + fz);
-    casingGroup.add(bT);
-
-    const bB = new THREE.Mesh(hexBoltGeo, boltMat);
-    bB.rotation.z = Math.PI / 2;
-    bB.position.set(winX - 0.06, winMinY - bezelThick * 0.5, winCenterZ + fz);
-    casingGroup.add(bB);
+  for (let i = 0; i < 6; i++) {
+    const angle = (i * Math.PI * 2) / 6;
+    const by = Math.sin(angle) * 0.78;
+    const bz = Math.cos(angle) * 0.78;
+    const b = new THREE.Mesh(hexBoltGeo, boltMat);
+    b.rotation.z = Math.PI / 2;
+    b.position.set(-halfW - wallThick - 0.36, shaftY + by, outputZ + bz);
+    b.castShadow = true;
+    casingGroup.add(b);
   }
 
-  // Transparent Optical Glass Pane
-  const glassGeo = new THREE.PlaneGeometry(winW, winH);
-  const glassMesh = new THREE.Mesh(glassGeo, windowMat);
-  glassMesh.rotation.y = -Math.PI / 2;
-  glassMesh.position.set(winX - 0.01, shaftY, winCenterZ);
-  casingGroup.add(glassMesh);
+  // Side Optical Observation Port on Left Wall (Preserves 3/4 sightline into gear teeth)
+  const sideWinH = Math.max(2.4, (casingTopY - sumpH) * 0.55);
+  const sideWinD = Math.max(3.6, Math.abs(outputZ - inputZ) * 1.25);
+  const sideWinGeo = new THREE.PlaneGeometry(sideWinD, sideWinH);
+  const sideWinMesh = new THREE.Mesh(sideWinGeo, windowMat);
+  sideWinMesh.rotation.y = -Math.PI / 2;
+  sideWinMesh.position.set(-halfW - wallThick - 0.02, shaftY + 0.4, (inputZ + outputZ) * 0.5);
+  casingGroup.add(sideWinMesh);
 
-  // Internal Warm Spotlight illuminating the bright steel gears from within
-  const intGearLight = new THREE.PointLight(0xffedd5, 1.8, 10, 1.2);
-  intGearLight.position.set(0, shaftY + 0.3, winCenterZ);
-  casingGroup.add(intGearLight);
+  // Side viewing window dark metal retaining bezel
+  const sideBezelThick = 0.08;
+  const sTopBar = new THREE.Mesh(new THREE.BoxGeometry(0.06, sideBezelThick, sideWinD + 0.16), bezelMat);
+  sTopBar.position.set(-halfW - wallThick - 0.03, shaftY + 0.4 + sideWinH * 0.5, (inputZ + outputZ) * 0.5);
+  casingGroup.add(sTopBar);
+
+  const sBotBar = new THREE.Mesh(new THREE.BoxGeometry(0.06, sideBezelThick, sideWinD + 0.16), bezelMat);
+  sBotBar.position.set(-halfW - wallThick - 0.03, shaftY + 0.4 - sideWinH * 0.5, (inputZ + outputZ) * 0.5);
+  casingGroup.add(sBotBar);
 
   // --------------------------------------------------------------------------
-  // 5. Rear Machine Face (+X side) with Output Bearing Housing Boss
+  // 4. Solid Right Housing Section & Output Bearing Housing Boss
   // --------------------------------------------------------------------------
-  const backX = halfW + wallThick * 0.5;
+  // Solid Right Structural Bulkhead Wall
+  const rightWallGeo = new THREE.BoxGeometry(wallThick, sideWallH, sideWallD);
+  const rightWallMesh = new THREE.Mesh(rightWallGeo, castMat);
+  rightWallMesh.position.set(halfW + wallThick * 0.5, sumpH + sideWallH * 0.5, 0);
+  rightWallMesh.castShadow = true;
+  rightWallMesh.receiveShadow = true;
+  casingGroup.add(rightWallMesh);
 
-  // Solid Rear Cast Bulkhead Wall
-  const backWall = new THREE.Mesh(
-    new THREE.BoxGeometry(wallThick, sideWallH, extD),
-    castMat
-  );
-  backWall.position.set(backX, sumpH + sideWallH * 0.5, 0);
-  backWall.castShadow = true;
-  backWall.receiveShadow = true;
-  casingGroup.add(backWall);
-
-  // Rear Bearing Boss: Output Shaft Pass-Through Housing (Driven Machine Side)
-  const outBossRadius = 0.96;
-  const outBossLength = 0.46;
-  const rearBossGeo = new THREE.CylinderGeometry(outBossRadius, outBossRadius + 0.06, outBossLength, 32);
-  const rearBossMesh = new THREE.Mesh(rearBossGeo, castMat);
-  rearBossMesh.rotation.z = -Math.PI / 2;
-  rearBossMesh.position.set(halfW + wallThick + outBossLength * 0.5, shaftY, outputZ);
-  rearBossMesh.castShadow = true;
-  rearBossMesh.receiveShadow = true;
-  casingGroup.add(rearBossMesh);
+  // Right Bearing Boss — Output Shaft Pass-Through Housing (Driven Machine Side)
+  const outBossRadius = 0.98;
+  const outBossLength = 0.48;
+  const rightBossGeo = new THREE.CylinderGeometry(outBossRadius, outBossRadius + 0.08, outBossLength, 32);
+  const rightBossMesh = new THREE.Mesh(rightBossGeo, castMat);
+  rightBossMesh.rotation.z = -Math.PI / 2;
+  rightBossMesh.position.set(halfW + wallThick + outBossLength * 0.5, shaftY, outputZ);
+  rightBossMesh.castShadow = true;
+  rightBossMesh.receiveShadow = true;
+  casingGroup.add(rightBossMesh);
 
   // Machined Output Flange Collar
   const outFlangeCollar = new THREE.Mesh(
-    new THREE.CylinderGeometry(outBossRadius + 0.16, outBossRadius + 0.16, 0.10, 32),
+    new THREE.CylinderGeometry(outBossRadius + 0.18, outBossRadius + 0.18, 0.10, 32),
     machinedMat
   );
   outFlangeCollar.rotation.z = -Math.PI / 2;
@@ -467,9 +437,9 @@ export function createGearboxCasing(options = {}) {
   outFlangeCollar.castShadow = true;
   casingGroup.add(outFlangeCollar);
 
-  // Rubber lip oil seal ring
+  // Oil seal ring surrounding output shaft
   const outSealRing = new THREE.Mesh(
-    new THREE.TorusGeometry(0.40, 0.045, 12, 28),
+    new THREE.TorusGeometry(0.44, 0.05, 12, 28),
     sealMat
   );
   outSealRing.rotation.y = Math.PI / 2;
@@ -483,98 +453,43 @@ export function createGearboxCasing(options = {}) {
     const bz = Math.cos(angle) * (outBossRadius + 0.08);
     const b = new THREE.Mesh(hexBoltGeo, boltMat);
     b.rotation.z = -Math.PI / 2;
-    b.position.set(halfW + wallThick + outBossLength - 0.09, shaftY + by, outputZ + bz);
+    b.position.set(halfW + wallThick + outBossLength - 0.10, shaftY + by, outputZ + bz);
     b.castShadow = true;
     casingGroup.add(b);
   }
 
-  // Rear Input Shaft Blind Bearing Hub (dead-end cover for input shaft on rear)
-  const blindBossGeo = new THREE.CylinderGeometry(0.82, 0.88, 0.28, 28);
-  const rearBlindBoss = new THREE.Mesh(blindBossGeo, castMat);
-  rearBlindBoss.rotation.z = -Math.PI / 2;
-  rearBlindBoss.position.set(halfW + wallThick + 0.14, shaftY, inputZ);
-  rearBlindBoss.castShadow = true;
-  casingGroup.add(rearBlindBoss);
+  // Right Input Shaft Blind Bearing Hub (Dead-End Bearing Cover)
+  const rightBlindBoss = new THREE.Mesh(blindBossGeo, castMat);
+  rightBlindBoss.rotation.z = -Math.PI / 2;
+  rightBlindBoss.position.set(halfW + wallThick + 0.16, shaftY, inputZ);
+  rightBlindBoss.castShadow = true;
+  casingGroup.add(rightBlindBoss);
 
-  const rearBlindFlange = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.92, 0.92, 0.08, 28),
+  const rightBlindFlange = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.96, 0.96, 0.08, 28),
     machinedMat
   );
-  rearBlindFlange.rotation.z = -Math.PI / 2;
-  rearBlindFlange.position.set(halfW + wallThick + 0.28, shaftY, inputZ);
-  casingGroup.add(rearBlindFlange);
+  rightBlindFlange.rotation.z = -Math.PI / 2;
+  rightBlindFlange.position.set(halfW + wallThick + 0.32, shaftY, inputZ);
+  casingGroup.add(rightBlindFlange);
 
   for (let i = 0; i < 6; i++) {
     const angle = (i * Math.PI * 2) / 6;
-    const by = Math.sin(angle) * 0.74;
-    const bz = Math.cos(angle) * 0.74;
+    const by = Math.sin(angle) * 0.78;
+    const bz = Math.cos(angle) * 0.78;
     const b = new THREE.Mesh(hexBoltGeo, boltMat);
     b.rotation.z = -Math.PI / 2;
-    b.position.set(halfW + wallThick + 0.32, shaftY + by, inputZ + bz);
+    b.position.set(halfW + wallThick + 0.36, shaftY + by, inputZ + bz);
     b.castShadow = true;
     casingGroup.add(b);
   }
 
-  // Rear Vertical Reinforcing Ribs
-  const rearRibGeo = new THREE.BoxGeometry(0.14, sideWallH - 0.6, 0.16);
-  const rearRibZs = [-extD * 0.28, 0, extD * 0.28];
-  for (const rz of rearRibZs) {
-    const rib = new THREE.Mesh(rearRibGeo, castDarkMat);
-    rib.position.set(backX + wallThick * 0.5 + 0.07, sumpH + sideWallH * 0.5, rz);
-    casingGroup.add(rib);
-  }
-
   // --------------------------------------------------------------------------
-  // 6. Left and Right End Bulkhead Walls (-Z and +Z)
+  // 5. Solid Top Housing, Parting Flange, Service Cover & Lifting Eye
   // --------------------------------------------------------------------------
-  const endWallGeo = new THREE.BoxGeometry(widthX, sideWallH, wallThick);
-
-  // Left End Wall (-Z)
-  const leftEndWall = new THREE.Mesh(endWallGeo, castMat);
-  leftEndWall.position.set(0, sumpH + sideWallH * 0.5, -halfD - wallThick * 0.5);
-  leftEndWall.castShadow = true;
-  leftEndWall.receiveShadow = true;
-  casingGroup.add(leftEndWall);
-
-  // Right End Wall (+Z)
-  const rightEndWall = new THREE.Mesh(endWallGeo, castMat);
-  rightEndWall.position.set(0, sumpH + sideWallH * 0.5, halfD + wallThick * 0.5);
-  rightEndWall.castShadow = true;
-  rightEndWall.receiveShadow = true;
-  casingGroup.add(rightEndWall);
-
-  // Industrial specification / rating plate on Right End Wall (+Z)
-  const nameplateW = Math.min(widthX * 0.65, 1.8);
-  const nameplateH = 0.65;
-  const nameplateGeo = new THREE.BoxGeometry(nameplateW, nameplateH, 0.03);
-  const nameplateMat = new THREE.MeshStandardMaterial({
-    color: 0x4a5a6a,
-    metalness: 0.88,
-    roughness: 0.30,
-  });
-  const nameplateMesh = new THREE.Mesh(nameplateGeo, nameplateMat);
-  nameplateMesh.position.set(0, shaftY + 0.5, halfD + wallThick + 0.02);
-  casingGroup.add(nameplateMesh);
-
-  // Nameplate corner rivets
-  const npx = nameplateW * 0.42;
-  const npy = nameplateH * 0.38;
-  const plateRivets = [[-npx, -npy], [npx, -npy], [-npx, npy], [npx, npy]];
-  for (const [px, py] of plateRivets) {
-    const rivet = new THREE.Mesh(
-      new THREE.SphereGeometry(0.03, 8, 8),
-      boltMat
-    );
-    rivet.position.set(px, shaftY + 0.5 + py, halfD + wallThick + 0.04);
-    casingGroup.add(rivet);
-  }
-
-  // --------------------------------------------------------------------------
-  // 7. Top Housing Cover, Service Hatch & Lifting Eye
-  // --------------------------------------------------------------------------
-  const topCoverH = 0.36;
-  const topCoverW = extW + 0.16;
-  const topCoverD = extD + 0.16;
+  const topCoverH = 0.42;
+  const topCoverW = widthX + wallThick * 2 + 0.25;
+  const topCoverD = depthZ + wallThick * 2 + 0.25;
 
   // Solid Cast Machine Crown / Roof
   const topCrownGeo = new THREE.BoxGeometry(topCoverW, topCoverH, topCoverD);
@@ -584,24 +499,49 @@ export function createGearboxCasing(options = {}) {
   topCrownMesh.receiveShadow = true;
   casingGroup.add(topCrownMesh);
 
-  // Chamfered upper casting drafts (giving the gearbox sloped, manufactured shoulders)
-  const draftGeo = new THREE.BoxGeometry(topCoverW - 0.20, 0.18, topCoverD - 0.20);
-  const draftMesh = new THREE.Mesh(draftGeo, castDarkMat);
-  draftMesh.position.set(0, casingTopY + topCoverH + 0.09, 0);
-  casingGroup.add(draftMesh);
+  // Horizontal Parting Line Joint Flange (where top and bottom castings join)
+  const partFlangeH = 0.16;
+  const partFlangeW = topCoverW + 0.20;
+  const partFlangeD = topCoverD + 0.20;
+
+  // Front & Back Parting Flange Rails
+  const pRailX = new THREE.BoxGeometry(partFlangeW, partFlangeH, 0.14);
+  const pFront = new THREE.Mesh(pRailX, machinedMat);
+  pFront.position.set(0, casingTopY - 0.08, halfD + wallThick + 0.07);
+  casingGroup.add(pFront);
+
+  const pBack = new THREE.Mesh(pRailX, machinedMat);
+  pBack.position.set(0, casingTopY - 0.08, -halfD - wallThick - 0.07);
+  casingGroup.add(pBack);
+
+  // Parting Flange Joint Clamping Hex Bolts (spaced evenly across front & back)
+  const partBoltSpacing = 1.4;
+  const numPartBolts = Math.max(3, Math.floor(partFlangeW / partBoltSpacing));
+  for (let i = 0; i < numPartBolts; i++) {
+    const bx = -partFlangeW * 0.45 + (i / (numPartBolts - 1)) * partFlangeW * 0.90;
+    const bF = new THREE.Mesh(hexBoltGeo, boltMat);
+    bF.position.set(bx, casingTopY - 0.08, halfD + wallThick + 0.15);
+    bF.rotation.x = Math.PI / 2;
+    casingGroup.add(bF);
+
+    const bB = new THREE.Mesh(hexBoltGeo, boltMat);
+    bB.position.set(bx, casingTopY - 0.08, -halfD - wallThick - 0.15);
+    bB.rotation.x = -Math.PI / 2;
+    casingGroup.add(bB);
+  }
 
   // Raised Top Inspection Service Access Hatch
-  const hatchW = Math.min(widthX * 0.60, 1.8);
-  const hatchD = Math.min(depthZ * 0.28, 2.4);
-  const hatchPlateGeo = new THREE.BoxGeometry(hatchW, 0.08, hatchD);
-  const hatchPlateMesh = new THREE.Mesh(hatchPlateGeo, machinedMat);
-  hatchPlateMesh.position.set(0, casingTopY + topCoverH + 0.18 + 0.04, 0);
+  const hatchW = Math.min(widthX * 0.60, 2.4);
+  const hatchD = Math.min(depthZ * 0.35, 2.2);
+  const hatchPlateGeo = new THREE.BoxGeometry(hatchW, 0.10, hatchD);
+  const hatchPlateMesh = new THREE.Mesh(hatchPlateGeo, castDarkMat);
+  hatchPlateMesh.position.set(0, casingTopY + topCoverH + 0.05, 0);
   hatchPlateMesh.castShadow = true;
   hatchPlateMesh.receiveShadow = true;
   casingGroup.add(hatchPlateMesh);
 
-  // Hatch Fastener Bolts (6 perimeter bolts)
-  const hbx = hatchW * 0.38;
+  // Hatch Fastener Bolts (4 corners + 2 center)
+  const hbx = hatchW * 0.40;
   const hbz = hatchD * 0.38;
   const hatchBolts = [
     [-hbx, -hbz], [0, -hbz], [hbx, -hbz],
@@ -609,26 +549,133 @@ export function createGearboxCasing(options = {}) {
   ];
   for (const [cx, cz] of hatchBolts) {
     const hBolt = new THREE.Mesh(hexBoltGeo, boltMat);
-    hBolt.position.set(cx, casingTopY + topCoverH + 0.18 + 0.08, cz);
+    hBolt.position.set(cx, casingTopY + topCoverH + 0.10 + 0.04, cz);
     hBolt.castShadow = true;
     casingGroup.add(hBolt);
   }
 
   // Heavy Drop-Forged Steel Lifting Eye Bolt
-  const eyeBaseGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.12, 20);
+  const eyeBaseGeo = new THREE.CylinderGeometry(0.20, 0.25, 0.14, 20);
   const eyeBase = new THREE.Mesh(eyeBaseGeo, machinedMat);
-  eyeBase.position.set(0, casingTopY + topCoverH + 0.18 + 0.06, 0);
+  eyeBase.position.set(0, casingTopY + topCoverH + 0.10 + 0.07, 0);
   eyeBase.castShadow = true;
   casingGroup.add(eyeBase);
 
-  const eyeTorusGeo = new THREE.TorusGeometry(0.24, 0.07, 16, 28);
+  const eyeTorusGeo = new THREE.TorusGeometry(0.26, 0.075, 16, 28);
   const eyeTorus = new THREE.Mesh(eyeTorusGeo, boltMat);
-  eyeTorus.position.set(0, casingTopY + topCoverH + 0.18 + 0.28, 0);
+  eyeTorus.position.set(0, casingTopY + topCoverH + 0.10 + 0.32, 0);
   eyeTorus.castShadow = true;
   casingGroup.add(eyeTorus);
 
   // --------------------------------------------------------------------------
-  // 8. Non-Blocking Raycasting Guarantee
+  // 6. Front Housing Section & LARGE TRANSPARENT INSPECTION WINDOW
+  // --------------------------------------------------------------------------
+  // Upper Solid Cast Header Wall above the Window
+  const frontHeaderH = 0.85;
+  const frontHeaderGeo = new THREE.BoxGeometry(widthX + wallThick * 2, frontHeaderH, wallThick);
+  const frontHeader = new THREE.Mesh(frontHeaderGeo, castMat);
+  frontHeader.position.set(0, casingTopY - frontHeaderH * 0.5, halfD + wallThick * 0.5);
+  frontHeader.castShadow = true;
+  casingGroup.add(frontHeader);
+
+  // Lower Solid Cast Apron Wall below the Window
+  const frontApronH = 0.65;
+  const frontApronGeo = new THREE.BoxGeometry(widthX + wallThick * 2, frontApronH, wallThick);
+  const frontApron = new THREE.Mesh(frontApronGeo, castMat);
+  frontApron.position.set(0, sumpH + frontApronH * 0.5, halfD + wallThick * 0.5);
+  frontApron.castShadow = true;
+  casingGroup.add(frontApron);
+
+  // Left & Right Solid Cast Upright Stiles framing the Window
+  const uprightW = 0.42;
+  const uprightH = (casingTopY - frontHeaderH) - (sumpH + frontApronH);
+  const uprightY = sumpH + frontApronH + uprightH * 0.5;
+
+  const leftUprightGeo = new THREE.BoxGeometry(uprightW, uprightH, wallThick);
+  const leftUpright = new THREE.Mesh(leftUprightGeo, castMat);
+  leftUpright.position.set(-halfW - wallThick * 0.5 + uprightW * 0.5, uprightY, halfD + wallThick * 0.5);
+  leftUpright.castShadow = true;
+  casingGroup.add(leftUpright);
+
+  const rightUpright = new THREE.Mesh(leftUprightGeo, castMat);
+  rightUpright.position.set(halfW + wallThick * 0.5 - uprightW * 0.5, uprightY, halfD + wallThick * 0.5);
+  rightUpright.castShadow = true;
+  casingGroup.add(rightUpright);
+
+  // The Inspection Window Opening Dimensions
+  const winW = (widthX + wallThick * 2) - uprightW * 2;
+  const winH = uprightH;
+  const winZ = halfD + wallThick + 0.02;
+
+  // Dark Metallic Machined Window Frame / Bezel
+  const bezelThick = 0.12;
+  const bezelDepth = 0.08;
+
+  // Top Bezel Bar
+  const bTop = new THREE.Mesh(new THREE.BoxGeometry(winW + bezelThick * 2, bezelThick, bezelDepth), bezelMat);
+  bTop.position.set(0, uprightY + winH * 0.5, winZ);
+  bTop.castShadow = true;
+  casingGroup.add(bTop);
+
+  // Bottom Bezel Bar
+  const bBot = new THREE.Mesh(new THREE.BoxGeometry(winW + bezelThick * 2, bezelThick, bezelDepth), bezelMat);
+  bBot.position.set(0, uprightY - winH * 0.5, winZ);
+  bBot.castShadow = true;
+  casingGroup.add(bBot);
+
+  // Left Bezel Bar
+  const bLeft = new THREE.Mesh(new THREE.BoxGeometry(bezelThick, winH, bezelDepth), bezelMat);
+  bLeft.position.set(-winW * 0.5 - bezelThick * 0.5, uprightY, winZ);
+  bLeft.castShadow = true;
+  casingGroup.add(bLeft);
+
+  // Right Bezel Bar
+  const bRight = new THREE.Mesh(new THREE.BoxGeometry(bezelThick, winH, bezelDepth), bezelMat);
+  bRight.position.set(winW * 0.5 + bezelThick * 0.5, uprightY, winZ);
+  bRight.castShadow = true;
+  casingGroup.add(bRight);
+
+  // Window Frame Perimeter Clamping Hex Bolts
+  const boltsPerX = Math.max(3, Math.floor(winW / 1.3));
+  for (let i = 0; i < boltsPerX; i++) {
+    const bx = -winW * 0.45 + (i / (boltsPerX - 1)) * winW * 0.90;
+    // Top frame bolts
+    const bT = new THREE.Mesh(hexBoltGeo, boltMat);
+    bT.rotation.x = Math.PI / 2;
+    bT.position.set(bx, uprightY + winH * 0.5, winZ + 0.05);
+    casingGroup.add(bT);
+
+    // Bottom frame bolts
+    const bB = new THREE.Mesh(hexBoltGeo, boltMat);
+    bB.rotation.x = Math.PI / 2;
+    bB.position.set(bx, uprightY - winH * 0.5, winZ + 0.05);
+    casingGroup.add(bB);
+  }
+
+  const boltsPerY = Math.max(2, Math.floor(winH / 1.4));
+  for (let i = 0; i < boltsPerY; i++) {
+    const by = -winH * 0.40 + (i / (boltsPerY - 1)) * winH * 0.80;
+    // Left frame bolts
+    const bL = new THREE.Mesh(hexBoltGeo, boltMat);
+    bL.rotation.x = Math.PI / 2;
+    bL.position.set(-winW * 0.5 - bezelThick * 0.5, uprightY + by, winZ + 0.05);
+    casingGroup.add(bL);
+
+    // Right frame bolts
+    const bR = new THREE.Mesh(hexBoltGeo, boltMat);
+    bR.rotation.x = Math.PI / 2;
+    bR.position.set(winW * 0.5 + bezelThick * 0.5, uprightY + by, winZ + 0.05);
+    casingGroup.add(bR);
+  }
+
+  // Thick Transparent Industrial Optical Acrylic Glass Pane
+  const frontGlassGeo = new THREE.PlaneGeometry(winW, winH);
+  const frontGlassMesh = new THREE.Mesh(frontGlassGeo, windowMat);
+  frontGlassMesh.position.set(0, uprightY, winZ - 0.01);
+  casingGroup.add(frontGlassMesh);
+
+  // --------------------------------------------------------------------------
+  // 7. Non-Blocking Raycasting Guarantee
   // --------------------------------------------------------------------------
   // Ensure that no mesh in the casing blocks or consumes raycasting events
   // so gear drag-and-drop, shaft clicks, and drop targets function flawlessly.
@@ -813,11 +860,11 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
   const maxGearOuterRadius = Math.max(inDim.gearOuterRadius, outDim.gearOuterRadius);
   const maxGearDiameter = maxGearOuterRadius * 2;
 
-  // Safe compact clearance around every gear (enforces compact heavy gearbox)
-  const safeClearance = 0.55;
+  // Safe clearance around every gear (2.5 units)
+  const safeClearance = 2.5;
 
-  // 2. Shaft Elevation Y: Guarantees safe bottom clearance above floor sump
-  const floorRailHeight = 0.38;
+  // 2. Shaft Elevation Y: Guarantees safe bottom clearance above floor rail
+  const floorRailHeight = 0.25;
   const currentShaftElevationY = maxGearOuterRadius + safeClearance + floorRailHeight;
   const shaftY = currentShaftElevationY;
 
@@ -828,11 +875,10 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
   const posZInput = -halfGearSpanZ + inDim.gearOuterRadius;
   const posZOutput = +halfGearSpanZ - outDim.gearOuterRadius;
 
-  // 4. Calculate Casing Internal Dimensions (Width:Height ratio target: 1.65)
-  const casingInternalWidthX = Math.max(2.4, inDim.hubThickness + 1.2);
+  // 4. Calculate Casing Internal Dimensions
+  const casingInternalWidthX = inDim.hubThickness + safeClearance * 2;
   const casingInternalHeightY = shaftY + maxGearOuterRadius + safeClearance;
-  const targetRatio = 1.65;
-  const casingInternalDepthZ = Math.max(totalGearSpanZ + safeClearance * 2, casingInternalHeightY * targetRatio - 0.6);
+  const casingInternalDepthZ = totalGearSpanZ + safeClearance * 2;
 
   // 5. Update Debug Telemetry
   debugTelemetry.inputGearCenter = { x: 0, y: Number(shaftY.toFixed(3)), z: Number(posZInput.toFixed(3)) };
@@ -885,43 +931,34 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
   scene.add(gearboxCasing);
 
   // 8. Create Electric Motor on left side (-X)
-  // Deep industrial blue cast housing firmly anchored to factory floor
-  const motorLength = 2.6;
-  const motorFlangeLength = 0.18;
-  const motorShaftLength = 1.1;
-  const motorFrontFlangeX = -casingInternalWidthX * 0.5 - 2.2;
-  const motorX = motorFrontFlangeX - motorLength * 0.5 - motorFlangeLength;
+  const motorX = -casingInternalWidthX * 0.5 - 2.5;
   const motor = createMotor({
     radius: 1.25,
-    length: motorLength,
+    length: 2.6,
     shaftY: shaftY,
-    bodyColor: 0x163452, // Deep industrial machine blue
-    endCoverColor: 0x102236,
-    flangeColor: 0x1b3c5e,
+    bodyColor: 0x1a3350,
+    endCoverColor: 0x122236,
     shaftRadius: 0.32,
-    shaftLength: motorShaftLength,
+    shaftLength: 1.1,
   });
   motor.position.set(motorX, shaftY, posZInput);
   scene.add(motor);
   const motorShaft = motor.userData.shaftGroup;
-
-  // 9. Create Input Shaft (Polished chrome turned steel)
-  // Connecting Motor -> Coupling -> Input Bearing Boss -> Gearbox
-  const couplingContactX = motorFrontFlangeX + motorShaftLength; // motor shaft tip
-  const inputShaftTotalLength = Math.abs(couplingContactX) + casingInternalWidthX * 0.5 + 0.4;
-  const inputShaftCenterX = couplingContactX + inputShaftTotalLength * 0.5;
+  // 9. Create Input Shaft (Polished turned steel)
+  const inputShaftTotalLength = casingInternalWidthX + 1.4;
+  const inputShaftCenterX = -0.7;
   const inputShaft = createShaft({
     radius: 0.32,
     length: inputShaftTotalLength,
-    color: 0xd4e2ee, // Bright polished steel
-    metalness: 0.96,
-    roughness: 0.16,
+    color: 0xa4b4c6,
+    metalness: 0.95,
+    roughness: 0.18,
     hasCoupling: true,
   });
   inputShaft.position.set(inputShaftCenterX, shaftY, posZInput);
   scene.add(inputShaft);
 
-  // 10. Create Input Gear (Bright polished steel, CW) or Slot Locator Ring
+  // 10. Create Input Gear (Hardened alloy gear steel, CW) or Slot Locator Ring
   let inputGear = null;
   let inputSlotMarker = null;
   let inputDirectionArrow = null;
@@ -931,9 +968,9 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.42,
-      color: 0xc8d6e5, // Bright polished steel
-      metalness: 0.95,
-      roughness: 0.18,
+      color: 0x9eb0c2, // Hardened alloy gear steel
+      metalness: 0.88,
+      roughness: 0.28,
     });
     inputGear.position.set(0, shaftY, posZInput);
     scene.add(inputGear);
@@ -970,9 +1007,9 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.50,
-      color: 0xc8d6e5, // Bright polished steel
-      metalness: 0.95,
-      roughness: 0.18,
+      color: 0x98a8ba, // Hardened alloy gear steel
+      metalness: 0.88,
+      roughness: 0.28,
     });
     outputGear.position.set(0, shaftY, posZOutput);
     scene.add(outputGear);
