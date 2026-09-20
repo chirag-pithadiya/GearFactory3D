@@ -109,12 +109,12 @@ function showTutorialStep(step) {
         modal.style.display = 'flex';
         modal.innerHTML = `
           <div class="tutorial-card">
-            <div class="modal-eyebrow">WORKSHOP TUTORIAL</div>
-            <h2 class="modal-title">HOW GEARS WORK</h2>
-            <p class="tutorial-desc">Learn how mechanical gears work in simple visual steps.</p>
+            <div class="modal-eyebrow">TUTORIAL MODE</div>
+            <h2 class="modal-title">GEAR FACTORY 3D</h2>
+            <p class="tutorial-desc">Learn how to build a mechanical gear train step-by-step.</p>
             <div class="tutorial-goal-box">
-              <span class="goal-label">YOUR GOAL:</span>
-              <span class="goal-text">Connect the gears to match the <strong>TARGET SPEED</strong> and run the machine.</span>
+              <span class="goal-label">MISSION GOAL:</span>
+              <span class="goal-text">Match the <strong>TARGET RPM</strong> by selecting and meshing the correct gear combination.</span>
             </div>
             <div class="tutorial-btn-row">
               <button type="button" class="btn-primary" id="btn-tut-start">START TUTORIAL</button>
@@ -142,9 +142,9 @@ function showTutorialStep(step) {
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 1 OF 6</span>
-            <span class="tut-step-title">1. The Electric Motor</span>
+            <span class="tut-step-title">1. Electric Drive Motor</span>
           </div>
-          <p class="tut-step-text">The electric motor powers the machine at a steady speed (e.g. <strong>1000 RPM</strong>). It turns the motor shaft continuously.</p>
+          <p class="tut-step-text">The heavy-duty electric motor delivers continuous rotational energy at a constant speed (e.g. <strong>1000 RPM</strong>). It powers the input drive shaft.</p>
           <div class="tut-actions">
             <button type="button" class="btn-tut-action btn-tut-next" id="btn-tut-step1-next">NEXT ➔</button>
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-1">SKIP</button>
@@ -158,15 +158,15 @@ function showTutorialStep(step) {
     }
 
     case 2: {
-      // Step 2: Choose Motor Gear (Concept 2)
+      // Step 2: Choose Input Gear (Concept 2)
       if (banner) {
         banner.style.display = 'flex';
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 2 OF 6</span>
-            <span class="tut-step-title">2. Choose a Gear</span>
+            <span class="tut-step-title">2. Input Pinion Selection</span>
           </div>
-          <p class="tut-step-text">Select a gear from your inventory (e.g. <strong>20T</strong>). The number of teeth determines how big or small the gear is.</p>
+          <p class="tut-step-text">Select a drive pinion from your inventory (e.g. <strong>20T</strong>). Tooth count (<strong>Z_in</strong>) dictates mechanical leverage.</p>
           <div class="tut-actions">
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-2">SKIP</button>
           </div>
@@ -178,19 +178,19 @@ function showTutorialStep(step) {
     }
 
     case 3: {
-      // Step 3: Drag Gear to Motor Shaft (Concept 3)
+      // Step 3: Drag Gear to Input Shaft (Concept 3)
       if (banner) {
         banner.style.display = 'flex';
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 3 OF 6</span>
-            <span class="tut-step-title">3. Place on Motor Shaft</span>
+            <span class="tut-step-title">3. Gear Placement on Shaft</span>
           </div>
-          <p class="tut-step-text">Drag the gear into the machine and place it onto the <strong>MOTOR SHAFT</strong> (or click the Motor Gear slot card).</p>
+          <p class="tut-step-text">Drag the gear into the 3D scene and snap it onto the <strong>INPUT SHAFT</strong> keyway (or click the slot card).</p>
           <div class="tut-guide-animation">
-            <span class="tut-guide-chip">⚙ Selected Gear</span>
+            <span class="tut-guide-chip">⚙ Selected Pinion</span>
             <span class="tut-guide-arrow">➔</span>
-            <span class="tut-guide-target">Motor Shaft</span>
+            <span class="tut-guide-target">Input Drive Shaft</span>
           </div>
           <div class="tut-actions">
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-3">SKIP</button>
@@ -203,15 +203,15 @@ function showTutorialStep(step) {
     }
 
     case 4: {
-      // Step 4: Machine Gear (Concept 4)
+      // Step 4: Output Gear (Concept 4)
       if (banner) {
         banner.style.display = 'flex';
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 4 OF 6</span>
-            <span class="tut-step-title">4. Connect Machine Gear</span>
+            <span class="tut-step-title">4. Output Driven Gear</span>
           </div>
-          <p class="tut-step-text">Now select another gear (e.g. <strong>40T</strong>) and drag it to the <strong>MACHINE SHAFT</strong> to mesh them together.</p>
+          <p class="tut-step-text">Select the mating driven gear (e.g. <strong>40T</strong>) and drag it to the <strong>OUTPUT SHAFT</strong> to complete the train.</p>
           <div class="tut-actions">
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-4">SKIP</button>
           </div>
@@ -223,17 +223,17 @@ function showTutorialStep(step) {
     }
 
     case 5: {
-      // Step 5: Rotation & Speed (Concepts 5, 6, 7)
+      // Step 5: Rotation, Transmission & Gear Ratio (Concepts 5, 6, 7)
       if (banner) {
         banner.style.display = 'flex';
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 5 OF 6</span>
-            <span class="tut-step-title">5. Gears in Motion</span>
+            <span class="tut-step-title">5. Rotation • 6. RPM Transmission • 7. Gear Ratio</span>
           </div>
-          <p class="tut-step-text">The gears are touching! They turn in opposite directions. Big gears turn slower, and small gears turn faster.</p>
+          <p class="tut-step-text">Gears are engaged! CW motor drives CCW output. Transmission speed obeys the fundamental gear ratio:</p>
           <div class="tut-formula-box">
-            <code>Small Gear ➔ Faster Speed &nbsp;•&nbsp; Big Gear ➔ Slower Speed</code>
+            <code>Output RPM = Input RPM × (Z_in / Z_out)</code>
           </div>
           <div class="tut-actions">
             <button type="button" class="btn-tut-action btn-tut-next" id="btn-tut-step5-next">NEXT ➔</button>
@@ -254,9 +254,9 @@ function showTutorialStep(step) {
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 6 OF 6</span>
-            <span class="tut-step-title">6. Check Solution</span>
+            <span class="tut-step-title">8. Solution Verification</span>
           </div>
-          <p class="tut-step-text">Click <strong>CHECK SOLUTION</strong> to see if your machine speed matches the target speed!</p>
+          <p class="tut-step-text">Click <strong>CHECK SOLUTION</strong> to verify if the transmission speed matches the target RPM.</p>
           <div class="tut-actions">
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-6">SKIP</button>
           </div>

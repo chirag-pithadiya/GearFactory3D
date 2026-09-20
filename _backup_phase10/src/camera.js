@@ -4,8 +4,8 @@
 
 import * as THREE from 'three';
 
-export const defaultCameraPos = new THREE.Vector3(-8.6, 6.5, 14.0);
-export const defaultTargetPos = new THREE.Vector3(0.0, 4.4, -0.4);
+export const defaultCameraPos = new THREE.Vector3(-7.5, 8.2, 12.0);
+export const defaultTargetPos = new THREE.Vector3(0, 5.3, -0.4);
 
 export const camera = new THREE.PerspectiveCamera(45, 16 / 10, 0.1, 100);
 camera.position.copy(defaultCameraPos);

@@ -5,8 +5,8 @@
 import * as THREE from 'three';
 
 export const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x3c4654);
-scene.fog = new THREE.Fog(0x3c4654, 35, 95);
+scene.background = new THREE.Color(0x0c1017);
+scene.fog = new THREE.Fog(0x0c1017, 22, 65);
 
 let rendererInstance = null;
 

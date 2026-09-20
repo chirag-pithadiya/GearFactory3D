@@ -31,7 +31,6 @@ import {
   calculateOutputRPM,
   calculateGearOuterRadius,
   debugTelemetry,
-  getContextualHint,
 } from './game-state.js';
 import {
   levelData,
@@ -90,14 +89,6 @@ import {
   formatTimer,
   updateTimerDisplay,
   updateSettingsUI,
-  updateContextualHintUI,
-  openHowGearsModal,
-  closeHowGearsModal,
-  openRpmInfoModal,
-  closeRpmInfoModal,
-  openWelcomeModal,
-  closeWelcomeModal,
-  checkFirstTimeWelcome,
 } from './ui.js';
 import {
   initDragDrop,
@@ -137,8 +128,8 @@ setupLighting(scene);
 const controls = initControls(camera, renderer.domElement);
 
 // Ensure camera is cleanly framed on the meshing gears
-camera.position.set(-8.6, 6.5, 14.0);
-controls.target.set(0.0, 4.4, -0.4);
+camera.position.set(-7.5, 8.2, 12.0);
+controls.target.set(0, 5.3, -0.4);
 controls.update();
 
 // Assembly reference holder
@@ -159,16 +150,6 @@ function refreshAssembly() {
 
   if (currentAssembly.labelsGroup) {
     currentAssembly.labelsGroup.visible = isLabelsVisible;
-  }
-
-  // Phase 11: Direction Arrow Visibility
-  const currentLvl = getLevel(puzzleState.currentLevel);
-  const showArrows = isLabelsVisible || (currentLvl && (currentLvl.showDirectionArrows || currentLvl.level === 4));
-  if (currentAssembly.inputDirectionArrow) {
-    currentAssembly.inputDirectionArrow.visible = !!(showArrows && puzzleState.selectedInputTeeth);
-  }
-  if (currentAssembly.outputDirectionArrow) {
-    currentAssembly.outputDirectionArrow.visible = !!(showArrows && puzzleState.selectedOutputTeeth);
   }
 
   // Phase 5: Update 3D drag drop target positions
@@ -421,18 +402,8 @@ function loadLevel(levelNumber, skipIntro = false) {
     level.motorRPM || level.inputRPM,
     level.targetRPM,
     level.difficulty,
-    level.objective,
-    level.visualHint
+    level.objective
   );
-
-  // Phase 11: Initialize contextual hint for this level
-  updateContextualHintUI(getContextualHint({
-    level: level.level,
-    hasInput: !!puzzleState.selectedInputTeeth,
-    hasOutput: !!puzzleState.selectedOutputTeeth,
-    targetRPM: level.targetRPM,
-  }));
-
   updateSelectedGearsUI(
     puzzleState.selectedInputTeeth,
     puzzleState.selectedOutputTeeth,
@@ -452,9 +423,6 @@ function loadLevel(levelNumber, skipIntro = false) {
 
   if (elements.btnNextLevel) {
     elements.btnNextLevel.disabled = levelNumber >= getTotalLevels() || !isLevelUnlocked(levelNumber + 1);
-  }
-  if (elements.btnHeaderNextLevel) {
-    elements.btnHeaderNextLevel.disabled = levelNumber >= getTotalLevels() || !isLevelUnlocked(levelNumber + 1);
   }
 
   refreshAssembly();
@@ -623,21 +591,6 @@ function onSelectionChanged() {
     false
   );
 
-  // Phase 11: Dynamic contextual hint update upon gear mounting / dismounting
-  if (level) {
-    updateContextualHintUI(getContextualHint({
-      level: level.level,
-      hasInput: !!puzzleState.selectedInputTeeth,
-      hasOutput: !!puzzleState.selectedOutputTeeth,
-      inputTeeth: puzzleState.selectedInputTeeth,
-      outputTeeth: puzzleState.selectedOutputTeeth,
-      targetRPM: level.targetRPM,
-      calculatedRPM: puzzleState.lastCalculatedRPM,
-      isCorrect: puzzleState.isSolutionPass,
-      hasChecked: puzzleState.hasCheckedSolution,
-    }));
-  }
-
   hideBanners();
 
   if (!puzzleState.selectedInputTeeth && !puzzleState.selectedOutputTeeth) {
@@ -649,7 +602,6 @@ function onSelectionChanged() {
   }
 
   if (elements.btnNextLevel) elements.btnNextLevel.disabled = true;
-  if (elements.btnHeaderNextLevel) elements.btnHeaderNextLevel.disabled = true;
 
   refreshAssembly();
   recalculateKinetics();
@@ -689,29 +641,12 @@ function checkPuzzleSolution(isUserClick = true) {
     setPuzzleStatusUI('LEVEL COMPLETE', 'complete');
     const isFinalLevel = puzzleState.currentLevel >= getTotalLevels();
     if (elements.btnNextLevel) elements.btnNextLevel.disabled = isFinalLevel;
-    if (elements.btnHeaderNextLevel) elements.btnHeaderNextLevel.disabled = isFinalLevel;
     showSuccessBanner(
       isFinalLevel
-        ? `GRANDMASTER COMPLETE: Gears connected! Machine running perfectly at ${result.calculatedRPM.toFixed(1)} RPM!`
-        : `GEARS CONNECTED! Machine running at target speed: ${result.calculatedRPM.toFixed(1)} RPM!`
+        ? `GRANDMASTER COMPLETE: Calculated ${result.calculatedRPM.toFixed(1)} RPM matches target ${result.targetRPM.toFixed(1)} RPM!`
+        : `Calculated ${result.calculatedRPM.toFixed(1)} RPM matches target ${result.targetRPM.toFixed(1)} RPM (diff: ${result.diff.toFixed(2)} RPM).`
     );
     audio.playSuccess();
-
-    // Phase 11: Update hint to celebrate
-    const level = getLevel(puzzleState.currentLevel);
-    if (level) {
-      updateContextualHintUI(getContextualHint({
-        level: level.level,
-        hasInput: !!puzzleState.selectedInputTeeth,
-        hasOutput: !!puzzleState.selectedOutputTeeth,
-        inputTeeth: puzzleState.selectedInputTeeth,
-        outputTeeth: puzzleState.selectedOutputTeeth,
-        targetRPM: level.targetRPM,
-        calculatedRPM: result.calculatedRPM,
-        isCorrect: true,
-        hasChecked: true,
-      }));
-    }
 
     // Check if in tutorial step 6
     if (tutorialState.isActive && tutorialState.currentStep === 6) {
@@ -734,30 +669,8 @@ function checkPuzzleSolution(isUserClick = true) {
     if (elements.btnNextLevel) {
       elements.btnNextLevel.disabled = puzzleState.currentLevel >= getTotalLevels() || !isLevelUnlocked(puzzleState.currentLevel + 1);
     }
-    if (elements.btnHeaderNextLevel) {
-      elements.btnHeaderNextLevel.disabled = puzzleState.currentLevel >= getTotalLevels() || !isLevelUnlocked(puzzleState.currentLevel + 1);
-    }
-    const speedDiffText = result.calculatedRPM > result.targetRPM
-      ? 'Machine turns too fast! Try a larger machine gear or smaller motor gear.'
-      : 'Machine turns too slow! Try a smaller machine gear or larger motor gear.';
-    showFailBanner(`Not quite! ${speedDiffText}`);
+    showFailBanner(`Speed does not match target. Try another gear combination!`);
     audio.playError();
-
-    // Phase 11: Non-harsh contextual coaching hint
-    const level = getLevel(puzzleState.currentLevel);
-    if (level) {
-      updateContextualHintUI(getContextualHint({
-        level: level.level,
-        hasInput: !!puzzleState.selectedInputTeeth,
-        hasOutput: !!puzzleState.selectedOutputTeeth,
-        inputTeeth: puzzleState.selectedInputTeeth,
-        outputTeeth: puzzleState.selectedOutputTeeth,
-        targetRPM: level.targetRPM,
-        calculatedRPM: result.calculatedRPM,
-        isCorrect: false,
-        hasChecked: true,
-      }));
-    }
   }
 
   return result.isCorrect;
@@ -836,15 +749,7 @@ initUI({
   onOpenTutorial: () => {
     audio.playButtonClick();
     closeMainMenu();
-    openHowGearsModal();
-  },
-  onOpenRpmInfo: () => {
-    audio.playButtonClick();
-    openRpmInfoModal();
-  },
-  onWelcomeStart: () => {
-    audio.playButtonClick();
-    loadLevel(1, false);
+    startTutorial();
   },
   onTogglePause: () => {
     if (state.isPaused) resumeGame();
@@ -957,11 +862,6 @@ loadLevel(initialLevel);
 setRunningState(true);
 setLabelToggleUI(isLabelsVisible);
 
-// Phase 11: First-time player welcome modal check
-checkFirstTimeWelcome(() => {
-  loadLevel(1, false);
-});
-
 /* ==========================================================================
    4. Animation Loop & Kinetic Simulation
    ========================================================================== */
@@ -1067,25 +967,6 @@ function animate(now = performance.now()) {
   }
   if (currentAssembly.outputSupportRight?.userData?.balls) {
     currentAssembly.outputSupportRight.userData.balls.rotation.x = outPhaseRot * 0.5;
-  }
-
-  // Phase 11: Direction Indicator Arrows Rotation
-  if (currentAssembly.inputDirectionArrow) {
-    currentAssembly.inputDirectionArrow.rotation.x = -kinetics.inputAngle;
-  }
-  if (currentAssembly.outputDirectionArrow) {
-    currentAssembly.outputDirectionArrow.rotation.x = outPhaseRot;
-  }
-
-  // Phase 11: Soft pulsing shaft guidance for beginner levels (1-5)
-  if (puzzleState.currentLevel <= 5) {
-    const pulse = 0.45 + 0.35 * Math.sin(now * 0.006);
-    if (currentAssembly.inputSlotMarker && !puzzleState.selectedInputTeeth && currentAssembly.inputSlotMarker.material) {
-      currentAssembly.inputSlotMarker.material.opacity = pulse;
-    }
-    if (currentAssembly.outputSlotMarker && !puzzleState.selectedOutputTeeth && currentAssembly.outputSlotMarker.material) {
-      currentAssembly.outputSlotMarker.material.opacity = pulse;
-    }
   }
 
   // Smooth OrbitControls damping
@@ -1247,17 +1128,5 @@ window.gearFactory = {
   openSettingsModal,
   closeSettingsModal,
   audio,
-  // Phase 11 API Surface
-  getContextualHint,
-  updateContextualHintUI,
-  openRpmInfoModal,
-  closeRpmInfoModal,
-  openWelcomeModal,
-  closeWelcomeModal,
-  checkFirstTimeWelcome,
-  openHowGearsModal,
-  closeHowGearsModal,
-  get inputDirectionArrow() { return currentAssembly.inputDirectionArrow; },
-  get outputDirectionArrow() { return currentAssembly.outputDirectionArrow; },
 };
 window.GearFactory = window.gearFactory;

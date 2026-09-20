@@ -28,55 +28,46 @@ export function createGearboxCasing(options = {}) {
     widthX = 2.6,
     heightY = 6.4,
     depthZ = 7.2,
-    frameColor = 0x283d36, // Dark desaturated green-slate cast metal
+    frameColor = 0x242a36, // Cast iron metallic dark slate
     panelColor = 0x8ab2d6, // Optical inspection acrylic
-    panelOpacity = 0.02,
-    metalness = 0.55,
-    roughness = 0.45,
+    panelOpacity = 0.04,
+    metalness = 0.72,
+    roughness = 0.56,
   } = options;
 
   const casingGroup = new THREE.Group();
   const shaftY = options.shaftY || 3.6;
 
-  // 1. Structural Cast Iron Rear Framing Stanchions & Low Front Mount Pedestals
-  // Rear stanchions stay in the background framing the machine; front lugs stay at base level
-  const rearPillarGeo = new THREE.BoxGeometry(0.28, heightY, 0.28);
-  const frontLugGeo = new THREE.BoxGeometry(0.32, 0.65, 0.32);
+  // 1. Structural Cast Iron Corner Stanchions
+  const pillarGeo = new THREE.BoxGeometry(0.28, heightY, 0.28);
   const castMat = new THREE.MeshStandardMaterial({
     color: frameColor,
     metalness: metalness,
     roughness: roughness,
   });
 
-  // Steel bolt material - clearly visible metallic fasteners
+  // Steel bolt material
   const boltMat = new THREE.MeshStandardMaterial({
-    color: 0x8a97a8,
+    color: 0x161d26,
     metalness: 0.92,
     roughness: 0.28,
   });
   const hexBoltGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.10, 6);
 
   const xCorners = [-widthX * 0.5 + 0.14, widthX * 0.5 - 0.14];
-  const zBack = -depthZ * 0.5 + 0.14;
-  const zFront = depthZ * 0.5 - 0.14;
+  const zCorners = [-depthZ * 0.5 + 0.14, depthZ * 0.5 - 0.14];
 
-  // Background rear pillars (framing the machine without blocking sightlines)
   for (const cx of xCorners) {
-    const rearPillar = new THREE.Mesh(rearPillarGeo, castMat);
-    rearPillar.position.set(cx, heightY * 0.5, zBack);
-    rearPillar.castShadow = true;
-    rearPillar.receiveShadow = true;
-    casingGroup.add(rearPillar);
-
-    // Front low mounting pedestals (low profile, never crosses machine or gears)
-    const frontLug = new THREE.Mesh(frontLugGeo, castMat);
-    frontLug.position.set(cx, 0.65 * 0.5, zFront);
-    frontLug.castShadow = true;
-    frontLug.receiveShadow = true;
-    casingGroup.add(frontLug);
+    for (const cz of zCorners) {
+      const pillar = new THREE.Mesh(pillarGeo, castMat);
+      pillar.position.set(cx, heightY * 0.5, cz);
+      pillar.castShadow = true;
+      pillar.receiveShadow = true;
+      casingGroup.add(pillar);
+    }
   }
 
-  // 2. Base Perimeter Flange Rails & Stiffeners (Sturdy cast machine bed)
+  // 2. Base Perimeter Flange Rails & Stiffeners
   const railH = 0.28;
   const railXGeo = new THREE.BoxGeometry(widthX, railH, 0.28);
   const rFront = new THREE.Mesh(railXGeo, castMat);
@@ -102,69 +93,59 @@ export function createGearboxCasing(options = {}) {
   rRight.castShadow = true;
   casingGroup.add(rRight);
 
-  // 3. Compact Industrial Inspection Cover & Lifting Eye (Snug Machine Cap, NOT an Oversized Roof)
-  // Background rear cross-tie beam connecting the two rear pillars
-  const tieGeo = new THREE.BoxGeometry(widthX - 0.28, 0.20, 0.20);
-  const tieBeam = new THREE.Mesh(tieGeo, castMat);
-  tieBeam.position.set(0, heightY, zBack);
-  tieBeam.castShadow = true;
-  casingGroup.add(tieBeam);
-
-  // Compact inspection lid mounted on the rear casting bridge
-  const lidH = 0.16;
-  const coverW = Math.min(widthX * 0.45, 2.2);
-  const coverD = Math.min(depthZ * 0.26, 1.8);
-  const topCoverZ = zBack + coverD * 0.5;
-  const topCoverGeo = new THREE.BoxGeometry(coverW, lidH, coverD);
+  // 3. Heavy Top Cover Lid with Inspection Service Hatch & Lifting Eye
+  const lidH = 0.28;
+  const topCoverGeo = new THREE.BoxGeometry(widthX + 0.24, lidH, depthZ + 0.24);
   const topCoverMesh = new THREE.Mesh(topCoverGeo, castMat);
-  topCoverMesh.position.set(0, heightY + lidH * 0.5, topCoverZ);
+  topCoverMesh.position.set(0, heightY + lidH * 0.5, 0);
   topCoverMesh.castShadow = true;
   topCoverMesh.receiveShadow = true;
   casingGroup.add(topCoverMesh);
 
-  // Top Inspection Service Cover (Raised cast plate with perimeter bolts)
-  const hatchGeo = new THREE.BoxGeometry(coverW * 0.72, 0.06, coverD * 0.65);
+  // Top Inspection Service Cover (Raised rectangular plate with perimeter bolts)
+  const hatchGeo = new THREE.BoxGeometry(widthX * 0.75, 0.08, depthZ * 0.45);
   const hatchMat = new THREE.MeshStandardMaterial({
-    color: 0x3d5249,
-    metalness: 0.72,
-    roughness: 0.38,
+    color: 0x303947,
+    metalness: 0.82,
+    roughness: 0.42,
   });
   const hatchMesh = new THREE.Mesh(hatchGeo, hatchMat);
-  hatchMesh.position.set(0, heightY + lidH + 0.03, topCoverZ);
+  hatchMesh.position.set(0, heightY + lidH + 0.04, 0);
   hatchMesh.castShadow = true;
   casingGroup.add(hatchMesh);
 
   // Inspection Cover Fastener Bolts (4 corners)
-  const hx = coverW * 0.28;
-  const hz = coverD * 0.24;
+  const hx = widthX * 0.32;
+  const hz = depthZ * 0.18;
   const hatchBoltCorners = [
     [-hx, -hz], [hx, -hz], [-hx, hz], [hx, hz]
   ];
   for (const [cx, cz] of hatchBoltCorners) {
     const hBolt = new THREE.Mesh(hexBoltGeo, boltMat);
-    hBolt.position.set(cx, heightY + lidH + 0.06 + 0.03, topCoverZ + cz);
+    hBolt.position.set(cx, heightY + lidH + 0.08 + 0.04, cz);
     hBolt.castShadow = true;
     casingGroup.add(hBolt);
   }
 
-  // Heavy Drop-Forged Steel Lifting Eye Bolt on top
+  // Heavy Drop-Forged Steel Lifting Eye Bolt on top center
   const eyeBase = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.16, 0.20, 0.10, 18),
+    new THREE.CylinderGeometry(0.22, 0.26, 0.14, 18),
     new THREE.MeshStandardMaterial({ color: 0x6e7b8a, metalness: 0.90, roughness: 0.25 })
   );
-  eyeBase.position.set(0, heightY + lidH + 0.06 + 0.05, topCoverZ);
+  eyeBase.position.set(0, heightY + lidH + 0.08 + 0.07, 0);
   eyeBase.castShadow = true;
   casingGroup.add(eyeBase);
 
   const eyeTorus = new THREE.Mesh(
-    new THREE.TorusGeometry(0.20, 0.055, 16, 24),
+    new THREE.TorusGeometry(0.28, 0.075, 16, 24),
     new THREE.MeshStandardMaterial({ color: 0x8a97a8, metalness: 0.94, roughness: 0.20 })
   );
-  eyeTorus.position.set(0, heightY + lidH + 0.06 + 0.24, topCoverZ);
+  eyeTorus.position.set(0, heightY + lidH + 0.08 + 0.38, 0);
   eyeTorus.castShadow = true;
   casingGroup.add(eyeTorus);
 
-  // 4. Background Rear Inspection Window Panel
+  // 5. Optical Inspection Windows & Steel Retaining Bezels (Front & Back)
+  // Ensures 100% crystal-clear visibility of all meshing teeth while preserving industrial housing
   const windowMat = new THREE.MeshStandardMaterial({
     color: panelColor,
     transparent: true,
@@ -175,21 +156,27 @@ export function createGearboxCasing(options = {}) {
     side: THREE.DoubleSide,
   });
 
-  const backWindow = new THREE.Mesh(
-    new THREE.PlaneGeometry(widthX - 0.28, heightY - 0.6),
-    windowMat
-  );
+  const windowGeo = new THREE.PlaneGeometry(widthX - 0.28, heightY - 0.6);
+  const frontWindow = new THREE.Mesh(windowGeo, windowMat);
+  frontWindow.position.set(0, heightY * 0.5 + 0.1, depthZ * 0.5 - 0.02);
+  casingGroup.add(frontWindow);
+
+  const backWindow = new THREE.Mesh(windowGeo, windowMat);
   backWindow.position.set(0, heightY * 0.5 + 0.1, -depthZ * 0.5 + 0.02);
   backWindow.rotation.y = Math.PI;
   casingGroup.add(backWindow);
 
-  // Retaining Base Bezel (Low trim rail on the base)
+  // Retaining Bezel Framing around Front Inspection Window
   const bezelMat = new THREE.MeshStandardMaterial({
-    color: 0x3a4b44,
-    metalness: 0.75,
+    color: 0x1a212b,
+    metalness: 0.88,
     roughness: 0.35,
   });
   const bezelBarH = new THREE.BoxGeometry(widthX - 0.18, 0.08, 0.04);
+  const bezelTop = new THREE.Mesh(bezelBarH, bezelMat);
+  bezelTop.position.set(0, heightY - 0.25, depthZ * 0.5 + 0.01);
+  casingGroup.add(bezelTop);
+
   const bezelBottom = new THREE.Mesh(bezelBarH, bezelMat);
   bezelBottom.position.set(0, 0.35, depthZ * 0.5 + 0.01);
   casingGroup.add(bezelBottom);
@@ -384,51 +371,6 @@ export function createLabel(text, options = {}) {
 }
 
 /**
- * Creates a subtle curved directional arc indicator with arrowhead.
- * Shows rotation direction (CW or CCW) on gear face for beginner learning.
- *
- * @param {number} radius - Arc radius
- * @param {boolean} isClockwise - true for CW, false for CCW
- * @param {number} color - Hex color
- * @returns {THREE.Group} Direction arrow group
- */
-export function createDirectionIndicator(radius = 1.6, isClockwise = true, color = 0xf59e0b) {
-  const dirGroup = new THREE.Group();
-
-  // 1. Semi-circular arc ring (about 120 degrees = 2.09 rad)
-  const arcLength = Math.PI * 0.70;
-  const ringGeo = new THREE.RingGeometry(radius - 0.07, radius + 0.07, 28, 1, 0, arcLength);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: color,
-    transparent: true,
-    opacity: 0.65,
-    side: THREE.DoubleSide,
-    depthWrite: false,
-  });
-  const arcMesh = new THREE.Mesh(ringGeo, ringMat);
-  dirGroup.add(arcMesh);
-
-  // 2. Arrowhead cone at the end of arc
-  const arrowGeo = new THREE.ConeGeometry(0.18, 0.40, 3);
-  const arrowMat = new THREE.MeshBasicMaterial({
-    color: color,
-    transparent: true,
-    opacity: 0.85,
-    depthWrite: false,
-  });
-  const arrowMesh = new THREE.Mesh(arrowGeo, arrowMat);
-  const tipAngle = arcLength;
-  arrowMesh.position.set(radius * Math.cos(tipAngle), radius * Math.sin(tipAngle), 0);
-  arrowMesh.rotation.z = tipAngle + (isClockwise ? -Math.PI / 2 : Math.PI / 2);
-  dirGroup.add(arrowMesh);
-
-  // Face perpendicular to X axis
-  dirGroup.rotation.y = Math.PI / 2;
-  dirGroup.userData = { isDirectionArrow: true, isClockwise };
-  return dirGroup;
-}
-
-/**
  * Rebuilds the complete 3D industrial gearbox assembly with safe internal clearances.
  * @param {THREE.Scene} scene - Scene to assemble components in
  * @param {Object} state - Main simulation state
@@ -496,8 +438,6 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
   if (oldAssembly.outputGear) scene.remove(oldAssembly.outputGear);
   if (oldAssembly.inputSlotMarker) scene.remove(oldAssembly.inputSlotMarker);
   if (oldAssembly.outputSlotMarker) scene.remove(oldAssembly.outputSlotMarker);
-  if (oldAssembly.inputDirectionArrow) scene.remove(oldAssembly.inputDirectionArrow);
-  if (oldAssembly.outputDirectionArrow) scene.remove(oldAssembly.outputDirectionArrow);
   if (oldAssembly.gearboxCasing) scene.remove(oldAssembly.gearboxCasing);
   if (oldAssembly.labelsGroup) scene.remove(oldAssembly.labelsGroup);
   if (oldAssembly.engagementContactFlash) scene.remove(oldAssembly.engagementContactFlash);
@@ -531,42 +471,35 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
   });
   motor.position.set(motorX, shaftY, posZInput);
   scene.add(motor);
-  const motorShaft = motor.userData.shaftGroup;  // 9. Create Input Shaft (Polished chrome steel)
+  const motorShaft = motor.userData.shaftGroup;
+
+  // 9. Create Input Shaft
   const inputShaftTotalLength = casingInternalWidthX + 1.4;
   const inputShaftCenterX = -0.7;
   const inputShaft = createShaft({
     radius: 0.32,
     length: inputShaftTotalLength,
-    color: 0xe8f0f8,
-    metalness: 0.95,
-    roughness: 0.15,
+    color: 0x94a3b8,
     hasCoupling: true,
   });
   inputShaft.position.set(inputShaftCenterX, shaftY, posZInput);
   scene.add(inputShaft);
 
-  // 10. Create Input Gear (High-clarity precision machined steel, CW) or Slot Locator Ring
+  // 10. Create Input Gear (Case-hardened nitrided tool steel, CW) or Slot Locator Ring
   let inputGear = null;
   let inputSlotMarker = null;
-  let inputDirectionArrow = null;
   if (selectedInputTeeth) {
     inputGear = createSpurGear({
       teeth: selectedInputTeeth,
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.42,
-      color: 0xd8e4f0, // Polished high-clarity mechanical steel
-      metalness: 0.92,
-      roughness: 0.20,
+      color: 0x928472, // Tempered case-hardened bronze/nitride tool steel
+      metalness: 0.86,
+      roughness: 0.28,
     });
     inputGear.position.set(0, shaftY, posZInput);
     scene.add(inputGear);
-
-    // Subtle CW Direction Indicator Arrow
-    const inArrowRadius = Math.max(0.85, inDim.pitchRadius * 0.70);
-    inputDirectionArrow = createDirectionIndicator(inArrowRadius, true, 0xf59e0b);
-    inputDirectionArrow.position.set(0.38, shaftY, posZInput);
-    scene.add(inputDirectionArrow);
   } else {
     // 3D Input Shaft Placement Slot Locator Ring
     const slotGeo = new THREE.TorusGeometry(0.55, 0.05, 12, 32);
@@ -583,10 +516,9 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
     scene.add(inputSlotMarker);
   }
 
-  // 11. Create Output Gear (High-clarity precision machined steel, CCW) or Slot Locator Ring
+  // 11. Create Output Gear (Precision machined hardened alloy steel, CCW) or Slot Locator Ring
   let outputGear = null;
   let outputSlotMarker = null;
-  let outputDirectionArrow = null;
   let initialPhaseOutput = 0.0;
   if (selectedOutputTeeth) {
     outputGear = createSpurGear({
@@ -594,21 +526,15 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.50,
-      color: 0xd0dce8, // Polished high-clarity mechanical steel
-      metalness: 0.92,
-      roughness: 0.22,
+      color: 0x75879a, // Precision ground hardened alloy steel
+      metalness: 0.89,
+      roughness: 0.24,
     });
     outputGear.position.set(0, shaftY, posZOutput);
     scene.add(outputGear);
 
     initialPhaseOutput = Math.PI / selectedOutputTeeth;
     outputGear.rotation.x = initialPhaseOutput;
-
-    // Subtle CCW Direction Indicator Arrow
-    const outArrowRadius = Math.max(0.85, outDim.pitchRadius * 0.70);
-    outputDirectionArrow = createDirectionIndicator(outArrowRadius, false, 0x38bdf8);
-    outputDirectionArrow.position.set(0.38, shaftY, posZOutput);
-    scene.add(outputDirectionArrow);
   } else {
     // 3D Output Shaft Placement Slot Locator Ring
     const slotGeo = new THREE.TorusGeometry(0.65, 0.05, 12, 32);
@@ -638,15 +564,13 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
   engagementContactFlash.position.set(0, shaftY, (posZInput + posZOutput) * 0.5);
   scene.add(engagementContactFlash);
 
-  // 12. Create Output Shaft (Polished chrome steel)
+  // 12. Create Output Shaft
   const outputShaftTotalLength = casingInternalWidthX + 6.0;
   const outputShaftCenterX = 3.0;
   const outputShaft = createShaft({
     radius: 0.40,
     length: outputShaftTotalLength,
-    color: 0xe8f0f8,
-    metalness: 0.95,
-    roughness: 0.15,
+    color: 0x8a95a5,
     hasCoupling: false,
   });
   outputShaft.position.set(outputShaftCenterX, shaftY, posZOutput);
@@ -664,7 +588,7 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
     width: 0.34,
     ballCount: 10,
     targetShaft: 'input',
-    housingColor: 0x32463e,
+    housingColor: 0x384452,
     flangeFacing: 1,
   });
   inputSupportLeft.position.set(-bearingX, shaftY, posZInput);
@@ -678,7 +602,7 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
     width: 0.34,
     ballCount: 10,
     targetShaft: 'input',
-    housingColor: 0x32463e,
+    housingColor: 0x384452,
     flangeFacing: -1,
   });
   inputSupportRight.position.set(bearingX, shaftY, posZInput);
@@ -693,7 +617,7 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
     width: 0.38,
     ballCount: 10,
     targetShaft: 'output',
-    housingColor: 0x32463e,
+    housingColor: 0x384452,
     flangeFacing: 1,
   });
   outputSupportLeft.position.set(-bearingX, shaftY, posZOutput);
@@ -707,7 +631,7 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
     width: 0.38,
     ballCount: 10,
     targetShaft: 'output',
-    housingColor: 0x32463e,
+    housingColor: 0x384452,
     flangeFacing: -1,
   });
   outputSupportRight.position.set(bearingX, shaftY, posZOutput);
@@ -725,9 +649,9 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
   labelMotor.position.set(motorX, shaftY + 2.5, posZInput);
   labelsGroup.add(labelMotor);
 
-  const labelInShaft = createLabel('MOTOR SHAFT', {
+  const labelInShaft = createLabel('INPUT SHAFT', {
     borderColor: '#e5a93c',
-    subtext: 'Coupled • CW Rotation ↻',
+    subtext: 'Coupled • CW Rotation',
     scale: 0.90,
   });
   labelInShaft.position.set(-inputShaftTotalLength * 0.4, shaftY + 1.4, posZInput);
@@ -735,7 +659,7 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
 
   const labelInGear = createLabel('INPUT GEAR', {
     borderColor: '#e5a93c',
-    subtext: selectedInputTeeth ? `${selectedInputTeeth}T Drive Gear • ↻ CW` : 'Unmounted • Bare Shaft',
+    subtext: selectedInputTeeth ? `${selectedInputTeeth}T Selected • Brass Gold` : 'Unmounted • Bare Shaft',
     scale: 0.90,
   });
   labelInGear.position.set(0, shaftY + inDim.gearOuterRadius + 1.2, posZInput);
@@ -743,15 +667,15 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
 
   const labelOutGear = createLabel('OUTPUT GEAR', {
     borderColor: '#60a5fa',
-    subtext: selectedOutputTeeth ? `${selectedOutputTeeth}T Driven Gear • ↺ CCW` : 'Unmounted • Bare Shaft',
+    subtext: selectedOutputTeeth ? `${selectedOutputTeeth}T Selected • Chrome Steel` : 'Unmounted • Bare Shaft',
     scale: 0.90,
   });
   labelOutGear.position.set(0, shaftY + outDim.gearOuterRadius + 1.2, posZOutput);
   labelsGroup.add(labelOutGear);
 
-  const labelOutShaft = createLabel('MACHINE SHAFT', {
+  const labelOutShaft = createLabel('OUTPUT SHAFT', {
     borderColor: '#60a5fa',
-    subtext: 'Output Drive • CCW Rotation ↺',
+    subtext: 'Extended Output Drive • CCW',
     scale: 0.90,
   });
   labelOutShaft.position.set(casingInternalWidthX * 0.5 + 2.8, shaftY + 1.4, posZOutput);
@@ -796,8 +720,6 @@ export function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOu
     outputGear,
     inputSlotMarker,
     outputSlotMarker,
-    inputDirectionArrow,
-    outputDirectionArrow,
     gearboxCasing,
     labelsGroup,
     bearingSupports,

@@ -45,10 +45,6 @@ export const elements = {
   btnPrevLevel: document.getElementById('btn-prev-level'),
   btnNextLevel: document.getElementById('btn-next-level'),
   btnClearSelection: document.getElementById('btn-clear-selection'),
-  btnHeaderPrevLevel: document.getElementById('btn-header-prev-level'),
-  btnHeaderNextLevel: document.getElementById('btn-header-next-level'),
-  headerLevelText: document.getElementById('header-level-text'),
-  btnHowItWorksAction: document.getElementById('btn-how-it-works-action'),
 
   // Banners
   puzzleSuccessBanner: document.getElementById('puzzle-success-banner'),
@@ -145,30 +141,6 @@ export const elements = {
   // Tutorial Dock & Modal
   tutorialDock: document.getElementById('tutorial-dock'),
   tutorialModal: document.getElementById('tutorial-modal'),
-
-  // Phase 11: Beginner-Friendly Guidance & Onboarding Elements
-  btnRpmInfo: document.getElementById('btn-rpm-info'),
-  rpmInfoModal: document.getElementById('rpm-info-modal'),
-  btnCloseRpmInfo: document.getElementById('btn-close-rpm-info'),
-  btnGotRpmInfo: document.getElementById('btn-got-rpm-info'),
-
-  welcomeModal: document.getElementById('welcome-modal'),
-  btnWelcomeStart: document.getElementById('btn-welcome-start'),
-
-  howGearsWorkModal: document.getElementById('how-gears-work-modal'),
-  btnCloseHowGears: document.getElementById('btn-close-how-gears'),
-  btnHowGearsPrev: document.getElementById('btn-how-gears-prev'),
-  btnHowGearsNext: document.getElementById('btn-how-gears-next'),
-  howGearsGuideTitle: document.getElementById('how-gears-guide-title'),
-  howGearsBody: document.getElementById('how-gears-body'),
-  howGearsDots: document.getElementById('how-gears-dots'),
-
-  missionVisualHint: document.getElementById('mission-visual-hint'),
-  missionObjectiveText: document.getElementById('mission-objective-text'),
-  contextualHintBar: document.getElementById('contextual-hint-bar'),
-  contextualHintText: document.getElementById('contextual-hint-text'),
-  introVisualHint: document.getElementById('intro-visual-hint'),
-  introTeachMsg: document.getElementById('intro-teach-msg'),
 };
 
 /**
@@ -210,10 +182,7 @@ export function initUI(handlers = {}) {
   elements.btnResetLevel?.addEventListener('click', () => onResetLevel && onResetLevel());
   elements.btnPrevLevel?.addEventListener('click', () => onPrevLevel && onPrevLevel());
   elements.btnNextLevel?.addEventListener('click', () => onNextLevel && onNextLevel());
-  elements.btnHeaderPrevLevel?.addEventListener('click', () => onPrevLevel && onPrevLevel());
-  elements.btnHeaderNextLevel?.addEventListener('click', () => onNextLevel && onNextLevel());
   elements.btnClearSelection?.addEventListener('click', () => onClearSelection && onClearSelection());
-  elements.btnHowItWorksAction?.addEventListener('click', () => openHowGearsModal(0));
 
   // Phase 2 Slot Buttons
   elements.btnPlaceInput?.addEventListener('click', (e) => {
@@ -323,33 +292,6 @@ export function initUI(handlers = {}) {
   });
   elements.btnToggleMusic?.addEventListener('click', () => {
     if (handlers.onToggleMusic) handlers.onToggleMusic();
-  });
-
-  // Phase 11: Beginner-Friendly Guidance & Onboarding Listeners
-  elements.btnRpmInfo?.addEventListener('click', () => openRpmInfoModal());
-  elements.btnCloseRpmInfo?.addEventListener('click', () => closeRpmInfoModal());
-  elements.btnGotRpmInfo?.addEventListener('click', () => closeRpmInfoModal());
-  elements.rpmInfoModal?.addEventListener('click', (e) => {
-    if (e.target === elements.rpmInfoModal) closeRpmInfoModal();
-  });
-
-  elements.btnWelcomeStart?.addEventListener('click', () => {
-    closeWelcomeModal();
-    try {
-      localStorage.setItem('gearfactory_welcomed', 'true');
-      localStorage.setItem('gear_factory_has_seen_welcome', 'true');
-    } catch (e) {}
-    if (handlers.onWelcomeStart) handlers.onWelcomeStart();
-  });
-  elements.welcomeModal?.addEventListener('click', (e) => {
-    if (e.target === elements.welcomeModal) closeWelcomeModal();
-  });
-
-  elements.btnCloseHowGears?.addEventListener('click', () => closeHowGearsModal());
-  elements.btnHowGearsPrev?.addEventListener('click', () => prevHowGearsPage());
-  elements.btnHowGearsNext?.addEventListener('click', () => nextHowGearsPage());
-  elements.howGearsWorkModal?.addEventListener('click', (e) => {
-    if (e.target === elements.howGearsWorkModal) closeHowGearsModal();
   });
 
   // Available Gear Inventory Binding
@@ -482,15 +424,15 @@ export function updateVerificationUI(selectedInputTeeth, selectedOutputTeeth, ta
   if (hasChecked && calculatedRPM !== null) {
     if (elements.puzzleCalculatedOutputRpm) {
       elements.puzzleCalculatedOutputRpm.textContent = `${calculatedRPM.toFixed(1)} RPM`;
-      elements.puzzleCalculatedOutputRpm.style.color = isPass ? '#34d399' : '#f59e0b';
+      elements.puzzleCalculatedOutputRpm.style.color = isPass ? '#34d399' : '#f87171';
     }
     if (elements.verificationStatusPill) {
-      elements.verificationStatusPill.textContent = isPass ? 'PERFECT' : 'NOT QUITE';
+      elements.verificationStatusPill.textContent = isPass ? 'PASS' : 'FAIL';
       elements.verificationStatusPill.className = `verification-status-pill ${isPass ? 'status-complete' : 'status-try-again'}`;
     }
     if (elements.puzzleStatusVal) {
-      elements.puzzleStatusVal.textContent = isPass ? 'SPEED MATCH (PERFECT)' : 'SPEED MISMATCH (NOT QUITE)';
-      elements.puzzleStatusVal.style.color = isPass ? '#34d399' : '#f59e0b';
+      elements.puzzleStatusVal.textContent = isPass ? 'MATCH (PASS)' : 'RPM MISMATCH (FAIL)';
+      elements.puzzleStatusVal.style.color = isPass ? '#34d399' : '#f87171';
     }
   } else {
     if (elements.puzzleCalculatedOutputRpm) {
@@ -530,10 +472,6 @@ export function showSuccessBanner(message) {
   if (elements.puzzleFailBanner) {
     elements.puzzleFailBanner.style.display = 'none';
   }
-  // Subtle tactile feedback on supported devices
-  if (typeof navigator !== 'undefined' && navigator.vibrate) {
-    try { navigator.vibrate(50); } catch (e) {}
-  }
 }
 
 export function showFailBanner(message) {
@@ -554,9 +492,9 @@ export function hideBanners() {
 }
 
 /**
- * Updates level objective badges (Current Level, Motor Input RPM, Target RPM, Visual Hint, Objective).
+ * Updates level objective badges (Current Level, Motor Input RPM, Target RPM).
  */
-export function updateLevelObjectiveUI(levelNumber, totalLevels, inputRPM, targetRPM, difficulty = 'EASY', objective = '', visualHint = '') {
+export function updateLevelObjectiveUI(levelNumber, totalLevels, inputRPM, targetRPM, difficulty = 'EASY', objective = '') {
   if (elements.puzzleLevelIndicator) {
     elements.puzzleLevelIndicator.textContent = `Level ${levelNumber} of ${totalLevels} • ${difficulty}`;
   }
@@ -566,27 +504,8 @@ export function updateLevelObjectiveUI(levelNumber, totalLevels, inputRPM, targe
   if (elements.puzzleTargetOutputRpm) {
     elements.puzzleTargetOutputRpm.textContent = targetRPM.toFixed(0);
   }
-  if (elements.missionVisualHint && visualHint) {
-    elements.missionVisualHint.textContent = visualHint;
-  }
-  if (elements.missionObjectiveText && objective) {
-    elements.missionObjectiveText.textContent = objective;
-  }
   if (elements.btnPrevLevel) {
     elements.btnPrevLevel.disabled = levelNumber <= 1;
-  }
-  if (elements.btnHeaderPrevLevel) {
-    elements.btnHeaderPrevLevel.disabled = levelNumber <= 1;
-  }
-  if (elements.headerLevelText) {
-    elements.headerLevelText.textContent = `LEVEL ${levelNumber}`;
-  }
-
-  // Soft guidance pulse on empty shafts for beginner levels 1–5
-  if (elements.inputShaftSlot && elements.outputShaftSlot) {
-    const isBeginner = levelNumber <= 5;
-    elements.inputShaftSlot.classList.toggle('beginner-guidance-pulse', isBeginner && !elements.inputShaftSlot.classList.contains('mounted'));
-    elements.outputShaftSlot.classList.toggle('beginner-guidance-pulse', isBeginner && !elements.outputShaftSlot.classList.contains('mounted'));
   }
 }
 
@@ -792,13 +711,7 @@ export function showLevelIntro(level, onStart) {
     elements.introTierBadge.textContent = level.difficulty || 'BEGINNER';
   }
   if (elements.introLevelTitle) {
-    elements.introLevelTitle.textContent = level.title || `LEVEL ${level.level}`;
-  }
-  if (elements.introVisualHint) {
-    elements.introVisualHint.textContent = level.visualHint || '⚙️ MECHANICAL PUZZLE';
-  }
-  if (elements.introTeachMsg) {
-    elements.introTeachMsg.textContent = level.teachMessage || level.objective || "Match the target machine speed.";
+    elements.introLevelTitle.textContent = `LEVEL ${level.level}`;
   }
   if (elements.introTargetRpm) {
     elements.introTargetRpm.textContent = `${level.targetRPM} RPM`;
@@ -882,165 +795,3 @@ export function updateTimerDisplay(totalSeconds) {
   }
   return formatted;
 }
-
-// ==========================================
-// Phase 11: Contextual Hint & Onboarding Modals
-// ==========================================
-
-export function updateContextualHintUI(hintText) {
-  if (elements.contextualHintText && hintText) {
-    elements.contextualHintText.textContent = hintText;
-    if (elements.contextualHintBar) {
-      elements.contextualHintBar.classList.add('hint-highlight');
-      setTimeout(() => {
-        elements.contextualHintBar?.classList.remove('hint-highlight');
-      }, 1500);
-    }
-  }
-}
-
-export function openRpmInfoModal() {
-  if (elements.rpmInfoModal) {
-    elements.rpmInfoModal.classList.add('active');
-    elements.rpmInfoModal.style.display = 'flex';
-  }
-}
-
-export function closeRpmInfoModal() {
-  if (elements.rpmInfoModal) {
-    elements.rpmInfoModal.classList.remove('active');
-    elements.rpmInfoModal.style.display = 'none';
-  }
-}
-
-export function openWelcomeModal() {
-  closeMainMenu();
-  closeLevelIntro();
-  if (elements.welcomeModal) {
-    elements.welcomeModal.classList.add('active');
-    elements.welcomeModal.style.display = 'flex';
-  }
-}
-
-export function closeWelcomeModal() {
-  if (elements.welcomeModal) {
-    elements.welcomeModal.classList.remove('active');
-    elements.welcomeModal.style.display = 'none';
-  }
-}
-
-export function checkFirstTimeWelcome(onStart) {
-  try {
-    const welcomed = localStorage.getItem('gearfactory_welcomed') || localStorage.getItem('gear_factory_has_seen_welcome');
-    if (!welcomed) {
-      openWelcomeModal();
-      return true;
-    }
-  } catch (e) {}
-  return false;
-}
-
-let currentHowGearsPage = 0;
-
-const howGearsPages = [
-  {
-    title: 'Small Gear',
-    svg: `<svg viewBox="0 0 100 100" width="90" height="90">
-      <circle cx="50" cy="50" r="30" fill="#1e293b" stroke="#f59e0b" stroke-width="4" stroke-dasharray="6,4"/>
-      <circle cx="50" cy="50" r="10" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
-      <text x="50" y="55" font-size="13" font-family="sans-serif" font-weight="bold" fill="#f59e0b" text-anchor="middle">10T</text>
-      <path d="M50 12 A38 38 0 0 1 82 32" fill="none" stroke="#38bdf8" stroke-width="3"/>
-    </svg>`,
-    desc: 'Small gears have fewer teeth. Small gears can spin faster.'
-  },
-  {
-    title: 'Big Gear',
-    svg: `<svg viewBox="0 0 100 100" width="90" height="90">
-      <circle cx="50" cy="50" r="42" fill="#1e293b" stroke="#94a3b8" stroke-width="5" stroke-dasharray="8,5"/>
-      <circle cx="50" cy="50" r="14" fill="#0f172a" stroke="#94a3b8" stroke-width="2"/>
-      <text x="50" y="56" font-size="15" font-family="sans-serif" font-weight="bold" fill="#f1f5f9" text-anchor="middle">40T</text>
-      <path d="M50 6 A44 44 0 0 1 76 16" fill="none" stroke="#94a3b8" stroke-width="3"/>
-    </svg>`,
-    desc: 'Big gears have more teeth. Big gears can spin slower.'
-  },
-  {
-    title: 'Two Gears',
-    svg: `<svg viewBox="0 0 120 70" width="120" height="70">
-      <circle cx="35" cy="35" r="22" fill="#1e293b" stroke="#f59e0b" stroke-width="3"/>
-      <text x="35" y="39" font-size="9" font-weight="bold" fill="#f59e0b" text-anchor="middle">CW ↻</text>
-      <circle cx="85" cy="35" r="22" fill="#1e293b" stroke="#38bdf8" stroke-width="3"/>
-      <text x="85" y="39" font-size="9" font-weight="bold" fill="#38bdf8" text-anchor="middle">CCW ↺</text>
-    </svg>`,
-    desc: 'When gears touch, they transfer movement in opposite directions.'
-  },
-  {
-    title: 'Your Turn',
-    svg: `<svg viewBox="0 0 100 70" width="100" height="70">
-      <rect x="10" y="15" width="80" height="40" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="3"/>
-      <text x="50" y="39" font-size="11" font-weight="bold" fill="#4ade80" text-anchor="middle">MATCH SPEED</text>
-    </svg>`,
-    desc: 'Try different gears and watch how speed changes to make the machine run!'
-  }
-];
-
-export function openHowGearsModal(page = 0) {
-  closeMainMenu();
-  closeLevelIntro();
-  currentHowGearsPage = Math.max(0, Math.min(page, howGearsPages.length - 1));
-  renderHowGearsPage(currentHowGearsPage);
-  if (elements.howGearsWorkModal) {
-    elements.howGearsWorkModal.classList.add('active');
-    elements.howGearsWorkModal.style.display = 'flex';
-  }
-}
-
-export function closeHowGearsModal() {
-  if (elements.howGearsWorkModal) {
-    elements.howGearsWorkModal.classList.remove('active');
-    elements.howGearsWorkModal.style.display = 'none';
-  }
-}
-
-export function renderHowGearsPage(index) {
-  currentHowGearsPage = index;
-  const p = howGearsPages[index];
-  if (!p) return;
-
-  if (elements.howGearsGuideTitle) {
-    elements.howGearsGuideTitle.textContent = p.title;
-  }
-  if (elements.howGearsBody) {
-    elements.howGearsBody.innerHTML = `
-      <div class="how-gears-illustration">${p.svg}</div>
-      <div class="how-gears-page-title">${p.title}</div>
-      <p class="how-gears-page-desc">${p.desc}</p>
-    `;
-  }
-  if (elements.howGearsDots) {
-    const dots = elements.howGearsDots.querySelectorAll('.h-dot');
-    dots.forEach((d, i) => {
-      d.classList.toggle('active', i === index);
-    });
-  }
-  if (elements.btnHowGearsPrev) {
-    elements.btnHowGearsPrev.disabled = index <= 0;
-  }
-  if (elements.btnHowGearsNext) {
-    elements.btnHowGearsNext.textContent = index >= howGearsPages.length - 1 ? "LET'S PLAY" : "NEXT ➔";
-  }
-}
-
-export function nextHowGearsPage() {
-  if (currentHowGearsPage < howGearsPages.length - 1) {
-    renderHowGearsPage(currentHowGearsPage + 1);
-  } else {
-    closeHowGearsModal();
-  }
-}
-
-export function prevHowGearsPage() {
-  if (currentHowGearsPage > 0) {
-    renderHowGearsPage(currentHowGearsPage - 1);
-  }
-}
-

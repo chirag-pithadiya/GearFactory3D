@@ -143,56 +143,6 @@ function calculateGearOuterRadius(teeth, module = GEAR_MODULE) {
     hubThickness,
   };
 }
-
-/**
- * Generates friendly, non-spoiling contextual mechanical hints based on current state.
- * Helps players understand gear size and speed relationships without revealing exact answers.
- *
- * @param {Object} params
- * @param {number} [params.level]
- * @param {number|null} [params.inputTeeth]
- * @param {number|null} [params.outputTeeth]
- * @param {number} [params.targetRPM]
- * @param {number|null} [params.calculatedRPM]
- * @param {boolean} [params.hasChecked]
- * @returns {string} Contextual hint text
- */
-function getContextualHint({ level = 1, inputTeeth = null, outputTeeth = null, targetRPM = 0, calculatedRPM = null, hasChecked = false } = {}) {
-  if (!inputTeeth && !outputTeeth) {
-    if (level === 1) {
-      return "Select a gear from the inventory below, then place it onto the motor shaft.";
-    }
-    return "Select an available gear from your inventory and place it onto a shaft.";
-  }
-
-  if (!inputTeeth && outputTeeth) {
-    return "Place a gear onto the motor shaft to connect with the machine gear.";
-  }
-
-  if (inputTeeth && !outputTeeth) {
-    return "Now place a second gear onto the machine shaft to complete the drive.";
-  }
-
-  // Both gears placed
-  if (!hasChecked) {
-    if (inputTeeth === outputTeeth) {
-      return "These gears are the same size. Press Check Solution or try different sizes to change speed.";
-    }
-    return "Both gears are meshed! Press Check Solution to test the machine speed.";
-  }
-
-  // After checking solution
-  const diff = calculatedRPM !== null ? Math.abs(calculatedRPM - targetRPM) : 999;
-  if (diff <= 1.0) {
-    return "Gears connected! The machine is running at the target speed.";
-  }
-
-  if (calculatedRPM !== null && calculatedRPM > targetRPM) {
-    return "The machine is turning too fast. Try a larger machine gear or a smaller motor gear.";
-  } else {
-    return "The machine is turning too slow. Try a smaller machine gear or a larger motor gear.";
-  }
-}
 // --- End: src/game-state.js ---
 
 // --- Begin: src/levels.js ---
@@ -215,144 +165,122 @@ const STORAGE_KEYS = {
 
 const levelData = [
   // ==========================================
-  // TIER 1: LEVELS 1–5 — BEGINNER (VISUAL LEARNING)
-  // Focus: visual concepts, intuitive mechanical relationships, no jargon
+  // TIER 1: LEVELS 1–5 — BEGINNER
+  // Focus: basic reduction, basic speed increase, 1:1 direct drive
   // ==========================================
   {
     level: 1,
     difficulty: 'BEGINNER',
-    title: 'Level 1 — Starting the Machine',
+    title: 'Level 1',
     motorRPM: 1000,
     inputRPM: 1000,
     targetRPM: 500,
     availableGears: [10, 20, 30, 40],
-    visualHint: 'MOTOR ↓ ⚙️',
-    teachMessage: "Let's start the machine.",
-    objective: 'Place a gear on the motor shaft, then connect a machine gear to start the machine (Target: 500 RPM).',
+    objective: 'Halve the motor speed to 500 RPM (2:1 reduction).',
     requireSeparateGears: true,
   },
   {
     level: 2,
     difficulty: 'BEGINNER',
-    title: 'Level 2 — Gear Size & Speed',
+    title: 'Level 2',
     motorRPM: 600,
     inputRPM: 600,
     targetRPM: 1200,
     availableGears: [10, 20, 30, 40],
-    visualHint: 'SMALL GEAR → BIG GEAR',
-    teachMessage: 'Big gears turn slower.',
-    objective: 'Big gears turn slower. Connect gears to double the machine speed to 1200 RPM.',
+    objective: 'Double the motor speed to 1200 RPM (1:2 step-up overdrive).',
     requireSeparateGears: true,
   },
   {
     level: 3,
     difficulty: 'BEGINNER',
-    title: 'Level 3 — Speed Transfer',
+    title: 'Level 3',
     motorRPM: 900,
     inputRPM: 900,
     targetRPM: 900,
     availableGears: [10, 20, 30, 40],
-    visualHint: 'BIG GEAR → SMALL GEAR',
-    teachMessage: 'Small gears turn faster.',
-    objective: 'Small gears turn faster. Matching equal gears transfer speed 1:1 at 900 RPM.',
+    objective: 'Transmit direct drive speed without alteration (1:1 ratio).',
     requireSeparateGears: false,
   },
   {
     level: 4,
     difficulty: 'BEGINNER',
-    title: 'Level 4 — Turning Direction',
+    title: 'Level 4',
     motorRPM: 1200,
     inputRPM: 1200,
     targetRPM: 400,
     availableGears: [10, 20, 30, 40],
-    visualHint: '↻ OPPOSITE ROTATION ↺',
-    teachMessage: 'Meshed gears turn in opposite directions.',
-    showDirectionArrows: true,
-    objective: 'Meshed gears turn in opposite directions. Reduce the speed to 400 RPM.',
+    objective: 'Reduce 1200 RPM to 400 RPM (3:1 reduction).',
     requireSeparateGears: true,
   },
   {
     level: 5,
     difficulty: 'BEGINNER',
-    title: 'Level 5 — Matching the Target',
+    title: 'Level 5',
     motorRPM: 1600,
     inputRPM: 1600,
     targetRPM: 400,
     availableGears: [10, 20, 30, 40, 50],
-    visualHint: 'MOTOR SPEED ➔ TARGET SPEED',
-    teachMessage: 'Make the output move at the target speed.',
-    rpmExplanation: 'RPM means how many times the gear turns in one minute.',
-    objective: 'Make the output machine gear move at the target speed: 400 RPM.',
+    objective: 'Quarter the motor speed to 400 RPM (4:1 reduction).',
     requireSeparateGears: true,
   },
 
   // ==========================================
-  // TIER 2: LEVELS 6–10 — INTERMEDIATE (DIFFICULTY PROGRESSION)
-  // Focus: discovering ratios, plausible distractors, fine tuning
+  // TIER 2: LEVELS 6–10 — INTERMEDIATE
+  // Focus: less obvious ratios, different motor RPM values, fractional gearing
   // ==========================================
   {
     level: 6,
     difficulty: 'INTERMEDIATE',
-    title: 'Level 6 — Increasing Speed',
+    title: 'Level 6',
     motorRPM: 800,
     inputRPM: 800,
     targetRPM: 1200,
     availableGears: [10, 20, 30, 40, 50],
-    visualHint: 'MORE GEAR CHOICES',
-    teachMessage: 'Choose the right pair from more options.',
-    objective: 'More gear choices available. Find the pair that boosts 800 RPM up to 1200 RPM.',
+    objective: 'Step up 800 RPM to 1200 RPM (3:2 ratio = 1.5x).',
     requireSeparateGears: true,
   },
   {
     level: 7,
     difficulty: 'INTERMEDIATE',
-    title: 'Level 7 — Slower Drive',
+    title: 'Level 7',
     motorRPM: 990,
     inputRPM: 990,
     targetRPM: 660,
     availableGears: [10, 20, 30, 40, 50],
-    visualHint: 'FIND THE PAIR',
-    teachMessage: 'Carefully compare the gear sizes.',
-    objective: 'Filter through distractors to reduce 990 RPM down to 660 RPM.',
+    objective: 'Moderate reduction to 660 RPM (2:3 ratio = 0.667x).',
     requireSeparateGears: true,
   },
   {
     level: 8,
     difficulty: 'INTERMEDIATE',
-    title: 'Level 8 — Speed Stepping',
+    title: 'Level 8',
     motorRPM: 900,
     inputRPM: 900,
     targetRPM: 1200,
     availableGears: [10, 20, 30, 40, 50],
-    visualHint: 'SPEED STEPPING',
-    teachMessage: 'Test gear combinations to find the step-up.',
-    objective: 'Carefully test gear sizes to increase speed from 900 RPM to 1200 RPM.',
+    objective: 'Step up 900 RPM to 1200 RPM (4:3 ratio = 1.333x).',
     requireSeparateGears: true,
   },
   {
     level: 9,
     difficulty: 'INTERMEDIATE',
-    title: 'Level 9 — High Speed Drive',
+    title: 'Level 9',
     motorRPM: 600,
     inputRPM: 600,
     targetRPM: 1500,
     availableGears: [10, 20, 30, 40, 50],
-    visualHint: 'HIGH SPEED DRIVE',
-    teachMessage: 'A large motor gear driving a small gear gives high speed.',
-    objective: 'Use a small machine gear to multiply speed from 600 RPM to 1500 RPM.',
+    objective: 'Boost 600 RPM to 1500 RPM (5:2 ratio = 2.5x).',
     requireSeparateGears: true,
   },
   {
     level: 10,
     difficulty: 'INTERMEDIATE',
-    title: 'Level 10 — Precision Gearing',
+    title: 'Level 10',
     motorRPM: 1200,
     inputRPM: 1200,
     targetRPM: 1500,
     availableGears: [10, 20, 30, 40, 50],
-    visualHint: 'PRECISION GEARING',
-    teachMessage: 'Your first real workshop puzzle.',
-    objective: 'Your first real workshop challenge: fine-tune the machine from 1200 RPM to 1500 RPM.',
+    objective: 'Fine speed increase to 1500 RPM (5:4 ratio = 1.25x).',
     requireSeparateGears: true,
   },
 
@@ -1544,9 +1472,9 @@ function createMotor(options = {}) {
   const {
     radius = 1.15,
     length = 2.4,
-    bodyColor = 0x1b3552, // Deep industrial machine blue
-    endCoverColor = 0x122338,
-    flangeColor = 0x223e60,
+    bodyColor = 0x223042, // Industrial machine slate teal-gray
+    endCoverColor = 0x182230,
+    flangeColor = 0x2c3848,
     shaftRadius = 0.28,
     shaftLength = 1.0,
     metalness = 0.74,
@@ -1816,8 +1744,8 @@ function createBallBearing(options = {}) {
     innerRadius = 2.5,
     width = 2.0,
     ballCount = 10,
-    outerColor = 0x4b5868, // Hardened bearing alloy outer raceway
-    innerColor = 0xd0dce8, // Precision ground mirror-smooth inner ring
+    outerColor = 0x384452, // Hardened bearing alloy outer raceway
+    innerColor = 0xb0c0d2, // Precision ground mirror-smooth inner ring
     ballColor = 0xf8fafc, // Mirror chrome bearing spheres
     metalness = 0.96,
     roughness = 0.16,
@@ -2335,16 +2263,7 @@ function createShaft(options = {}) {
 
 // --- Begin: src/lighting.js ---
 /**
- * Gear Factory 3D — Lighting & Industrial Workshop Environment Setup
- *
- * Phase 12 Features:
- * - Medium-dark visible industrial factory walls
- * - Warm gray concrete workshop floor with subtle expansion joints
- * - Structural steel I-beams and overhead ceiling rafters
- * - Industrial overhead copper and steel conduit pipes
- * - Background machinery silhouettes with subtle indicator lights
- * - Vintage workshop pendant lamps
- * - Balanced warm key, cool fill, rim light, and ambient illumination
+ * Gear Factory 3D — Lighting & Environment Setup
  */
 
 
@@ -2352,205 +2271,54 @@ let inputGearGlow = null;
 let outputGearGlow = null;
 
 /**
- * Creates lightweight 3D industrial workshop architecture and machinery.
- * @param {THREE.Scene} scene - The target Three.js scene
- * @returns {THREE.Group} Complete environment group
- */
-function createWorkshopEnvironment(scene) {
-  const envGroup = new THREE.Group();
-  envGroup.name = 'workshopEnvironment';
-
-  // Materials: Muted industrial gray concrete & structural steel
-  const wallMat = new THREE.MeshStandardMaterial({
-    color: 0x546072, // Warm visible gray concrete wall
-    roughness: 0.88,
-    metalness: 0.08,
-  });
-
-  const wainscotMat = new THREE.MeshStandardMaterial({
-    color: 0x3d4756, // Protective wainscot base
-    roughness: 0.82,
-    metalness: 0.15,
-  });
-
-  const steelBeamMat = new THREE.MeshStandardMaterial({
-    color: 0x3a4656,
-    roughness: 0.62,
-    metalness: 0.55,
-  });
-
-  const pipeSteelMat = new THREE.MeshStandardMaterial({
-    color: 0x505f72,
-    roughness: 0.40,
-    metalness: 0.82,
-  });
-
-  const pipeCopperMat = new THREE.MeshStandardMaterial({
-    color: 0xaa7855,
-    roughness: 0.35,
-    metalness: 0.75,
-  });
-
-  const machineMetalMat = new THREE.MeshStandardMaterial({
-    color: 0x323e4e,
-    roughness: 0.68,
-    metalness: 0.45,
-  });
-
-  // 1. Back Industrial Wall (Distant, framing the background at Z = -18)
-  const backWallGeo = new THREE.BoxGeometry(60, 24, 0.6);
-  const backWallMesh = new THREE.Mesh(backWallGeo, wallMat);
-  backWallMesh.position.set(0, 12, -18);
-  backWallMesh.receiveShadow = true;
-  envGroup.add(backWallMesh);
-
-  // Back Wall Wainscoting (lower protective base)
-  const wainscotGeo = new THREE.BoxGeometry(60, 3.2, 0.8);
-  const wainscotMesh = new THREE.Mesh(wainscotGeo, wainscotMat);
-  wainscotMesh.position.set(0, 1.6, -17.8);
-  wainscotMesh.receiveShadow = true;
-  envGroup.add(wainscotMesh);
-
-  // Left Industrial Side Wall (at far distance)
-  const leftWallGeo = new THREE.BoxGeometry(0.6, 24, 40);
-  const leftWallMesh = new THREE.Mesh(leftWallGeo, wallMat);
-  leftWallMesh.position.set(-28, 12, 0);
-  leftWallMesh.receiveShadow = true;
-  envGroup.add(leftWallMesh);
-
-  // 2. Structural Steel Columns / Pilasters (Mounted flush against back wall, never blocking machine)
-  const columnGeo = new THREE.BoxGeometry(1.0, 24, 0.4);
-  const colPositions = [
-    [-18, -17.5],
-    [-8, -17.5],
-    [8, -17.5],
-    [18, -17.5],
-  ];
-  for (const [cx, cz] of colPositions) {
-    const col = new THREE.Mesh(columnGeo, steelBeamMat);
-    col.position.set(cx, 12, cz);
-    col.castShadow = true;
-    col.receiveShadow = true;
-    envGroup.add(col);
-  }
-
-  // 3. Structural Steel Ceiling Beam (Across the top of the back wall only)
-  const beamGeo = new THREE.BoxGeometry(60, 0.8, 0.4);
-  const beamHeights = [18.8, 21.0];
-  for (const by of beamHeights) {
-    const beam = new THREE.Mesh(beamGeo, steelBeamMat);
-    beam.position.set(0, by, -17.4);
-    beam.castShadow = true;
-    envGroup.add(beam);
-  }
-
-  // 4. Industrial Overhead Conduit Pipes (Mounted high on back wall)
-  const pipeCopperGeo = new THREE.CylinderGeometry(0.10, 0.10, 58, 16);
-  const pipeCopperMesh = new THREE.Mesh(pipeCopperGeo, pipeCopperMat);
-  pipeCopperMesh.rotation.z = Math.PI / 2;
-  pipeCopperMesh.position.set(0, 15.5, -17.2);
-  envGroup.add(pipeCopperMesh);
-
-  const pipeSteelGeo = new THREE.CylinderGeometry(0.14, 0.14, 58, 16);
-  const pipeSteelMesh = new THREE.Mesh(pipeSteelGeo, pipeSteelMat);
-  pipeSteelMesh.rotation.z = Math.PI / 2;
-  pipeSteelMesh.position.set(0, 14.7, -17.1);
-  envGroup.add(pipeSteelMesh);
-
-  // Vertical feeder conduits on back wall
-  const vertPipeGeo = new THREE.CylinderGeometry(0.08, 0.08, 12, 12);
-  const vertXs = [-14, 14];
-  for (const vx of vertXs) {
-    const vPipe = new THREE.Mesh(vertPipeGeo, pipeSteelMat);
-    vPipe.position.set(vx, 8.5, -17.2);
-    envGroup.add(vPipe);
-  }
-
-  // 5. Subtle Background Machinery Silhouettes (Positioned far to sides, framing the hero gearbox)
-  // Electrical Control Panel Cabinet (Distant Right)
-  const cabinetGeo = new THREE.BoxGeometry(3.5, 7.0, 1.8);
-  const cabinetMesh = new THREE.Mesh(cabinetGeo, machineMetalMat);
-  cabinetMesh.position.set(15.5, 3.5, -16.2);
-  cabinetMesh.castShadow = true;
-  cabinetMesh.receiveShadow = true;
-  envGroup.add(cabinetMesh);
-
-  // Cabinet status indicator light (soft emerald LED)
-  const ledGeo = new THREE.SphereGeometry(0.08, 8, 8);
-  const ledMat = new THREE.MeshBasicMaterial({ color: 0x34d399 });
-  const ledMesh = new THREE.Mesh(ledGeo, ledMat);
-  ledMesh.position.set(14.6, 6.2, -15.2);
-  envGroup.add(ledMesh);
-
-  // Industrial Generator / Lathe Block (Distant Left)
-  const latheBaseGeo = new THREE.BoxGeometry(5.2, 2.8, 2.4);
-  const latheBase = new THREE.Mesh(latheBaseGeo, machineMetalMat);
-  latheBase.position.set(-15.0, 1.4, -16.0);
-  latheBase.castShadow = true;
-  latheBase.receiveShadow = true;
-  envGroup.add(latheBase);
-
-  const latheHeadGeo = new THREE.CylinderGeometry(0.9, 0.9, 3.0, 18);
-  const latheHead = new THREE.Mesh(latheHeadGeo, machineMetalMat);
-  latheHead.rotation.z = Math.PI / 2;
-  latheHead.position.set(-15.0, 3.3, -16.0);
-  latheHead.castShadow = true;
-  latheHead.receiveShadow = true;
-  envGroup.add(latheHead);
-
-  scene.add(envGroup);
-  return envGroup;
-}
-
-/**
- * Sets up industrial factory lighting, workshop environment, and concrete floor.
+ * Sets up industrial factory lighting and ground plane.
  * @param {THREE.Scene} scene - The target Three.js scene
  */
 function setupLighting(scene) {
-  // 1. Ambient Light: Clear, warm-neutral workshop fill ensuring zero pitch-black areas
-  const ambientLight = new THREE.AmbientLight(0xf0f4f8, 1.65);
+  // Ambient Light for soft fill
+  const ambientLight = new THREE.AmbientLight(0xdde7f4, 1.15);
   scene.add(ambientLight);
 
-  // 2. Warm Key Directional Light: Warm high-angle industrial work lamp
-  const keyLight = new THREE.DirectionalLight(0xfff2dc, 3.0);
-  keyLight.position.set(10, 20, 14);
+  // Key Directional Light casting soft realistic shadows (5600K neutral studio key)
+  const keyLight = new THREE.DirectionalLight(0xfffaee, 2.7);
+  keyLight.position.set(9, 18, 11);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.width = 2048;
   keyLight.shadow.mapSize.height = 2048;
   keyLight.shadow.camera.near = 0.5;
-  keyLight.shadow.camera.far = 52;
-  keyLight.shadow.camera.left = -16;
-  keyLight.shadow.camera.right = 16;
-  keyLight.shadow.camera.top = 16;
-  keyLight.shadow.camera.bottom = -16;
+  keyLight.shadow.camera.far = 48;
+  keyLight.shadow.camera.left = -14;
+  keyLight.shadow.camera.right = 14;
+  keyLight.shadow.camera.top = 14;
+  keyLight.shadow.camera.bottom = -14;
   keyLight.shadow.bias = -0.0003;
   scene.add(keyLight);
 
-  // 3. Cool Neutral Fill Light: Soft bounce from open factory bay
-  const frontFillLight = new THREE.DirectionalLight(0xd6e6f6, 1.85);
-  frontFillLight.position.set(-10, 14, 14);
+  // Front Fill Light for crystal-clear internal visibility
+  const frontFillLight = new THREE.DirectionalLight(0xd0e0f2, 1.6);
+  frontFillLight.position.set(-6, 12, 15);
   scene.add(frontFillLight);
 
-  // 4. Rim / Edge Light: Crisp metallic highlights on gear teeth and polished shafts
-  const rimLight = new THREE.DirectionalLight(0xb8d4f0, 2.2);
-  rimLight.position.set(-14, 14, -14);
+  // Rim Light highlighting metallic gear edges
+  const rimLight = new THREE.DirectionalLight(0xa5c4e8, 1.6);
+  rimLight.position.set(-14, 10, -10);
   scene.add(rimLight);
 
-  // 5. Dual Overhead Workshop Spotlights: Direct illumination over input and output gears
-  inputGearGlow = new THREE.PointLight(0xfff4e6, 2.8, 22, 1.1);
-  inputGearGlow.position.set(-1.0, 8.5, -2.4);
+  // Point Lights inside gearbox providing clean neutral illumination on gear faces
+  inputGearGlow = new THREE.PointLight(0xfff6ea, 2.2, 16, 1.2);
+  inputGearGlow.position.set(-1.0, 7.5, -3.2);
   scene.add(inputGearGlow);
 
-  outputGearGlow = new THREE.PointLight(0xf0f6ff, 2.8, 22, 1.1);
-  outputGearGlow.position.set(1.0, 8.5, 2.4);
+  outputGearGlow = new THREE.PointLight(0xedf4fc, 2.2, 16, 1.2);
+  outputGearGlow.position.set(1.0, 7.5, 1.6);
   scene.add(outputGearGlow);
 
-  // 6. Warm Gray Concrete Workshop Floor Plane (Natural floor without technical CAD grid)
-  const floorGeometry = new THREE.PlaneGeometry(80, 80);
+  // Factory Floor Plane receiving shadows (matte industrial concrete workshop floor)
+  const floorGeometry = new THREE.PlaneGeometry(50, 50);
   const floorMaterial = new THREE.MeshStandardMaterial({
-    color: 0x4a5462, // Warm industrial gray concrete
-    roughness: 0.84,
-    metalness: 0.08,
+    color: 0x141822,
+    roughness: 0.80,
+    metalness: 0.20,
   });
   const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
   floorMesh.rotation.x = -Math.PI / 2;
@@ -2558,8 +2326,10 @@ function setupLighting(scene) {
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
 
-  // 7. 3D Industrial Factory Workshop Architecture (Strictly Background)
-  const environmentGroup = createWorkshopEnvironment(scene);
+  // Precision Grid Helper with subtle slate engineering styling
+  const gridHelper = new THREE.GridHelper(30, 30, 0x475569, 0x1e2634);
+  gridHelper.position.y = 0.005;
+  scene.add(gridHelper);
 
   return {
     ambientLight,
@@ -2569,7 +2339,7 @@ function setupLighting(scene) {
     inputGearGlow,
     outputGearGlow,
     floorMesh,
-    environmentGroup,
+    gridHelper,
   };
 }
 
@@ -2577,7 +2347,6 @@ function updateGlowPositions(inX, inY, inZ, outX, outY, outZ) {
   if (inputGearGlow) inputGearGlow.position.set(inX, inY, inZ);
   if (outputGearGlow) outputGearGlow.position.set(outX, outY, outZ);
 }
-
 // --- End: src/lighting.js ---
 
 // --- Begin: src/camera.js ---
@@ -2586,8 +2355,8 @@ function updateGlowPositions(inX, inY, inZ, outX, outY, outZ) {
  */
 
 
-const defaultCameraPos = new THREE.Vector3(-8.6, 6.5, 14.0);
-const defaultTargetPos = new THREE.Vector3(0.0, 4.4, -0.4);
+const defaultCameraPos = new THREE.Vector3(-7.5, 8.2, 12.0);
+const defaultTargetPos = new THREE.Vector3(0, 5.3, -0.4);
 
 const camera = new THREE.PerspectiveCamera(45, 16 / 10, 0.1, 100);
 camera.position.copy(defaultCameraPos);
@@ -2667,8 +2436,8 @@ function resetControls() {
 
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x3c4654);
-scene.fog = new THREE.Fog(0x3c4654, 35, 95);
+scene.background = new THREE.Color(0x0c1017);
+scene.fog = new THREE.Fog(0x0c1017, 22, 65);
 
 let rendererInstance = null;
 
@@ -2770,55 +2539,46 @@ function createGearboxCasing(options = {}) {
     widthX = 2.6,
     heightY = 6.4,
     depthZ = 7.2,
-    frameColor = 0x283d36, // Dark desaturated green-slate cast metal
+    frameColor = 0x242a36, // Cast iron metallic dark slate
     panelColor = 0x8ab2d6, // Optical inspection acrylic
-    panelOpacity = 0.02,
-    metalness = 0.55,
-    roughness = 0.45,
+    panelOpacity = 0.04,
+    metalness = 0.72,
+    roughness = 0.56,
   } = options;
 
   const casingGroup = new THREE.Group();
   const shaftY = options.shaftY || 3.6;
 
-  // 1. Structural Cast Iron Rear Framing Stanchions & Low Front Mount Pedestals
-  // Rear stanchions stay in the background framing the machine; front lugs stay at base level
-  const rearPillarGeo = new THREE.BoxGeometry(0.28, heightY, 0.28);
-  const frontLugGeo = new THREE.BoxGeometry(0.32, 0.65, 0.32);
+  // 1. Structural Cast Iron Corner Stanchions
+  const pillarGeo = new THREE.BoxGeometry(0.28, heightY, 0.28);
   const castMat = new THREE.MeshStandardMaterial({
     color: frameColor,
     metalness: metalness,
     roughness: roughness,
   });
 
-  // Steel bolt material - clearly visible metallic fasteners
+  // Steel bolt material
   const boltMat = new THREE.MeshStandardMaterial({
-    color: 0x8a97a8,
+    color: 0x161d26,
     metalness: 0.92,
     roughness: 0.28,
   });
   const hexBoltGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.10, 6);
 
   const xCorners = [-widthX * 0.5 + 0.14, widthX * 0.5 - 0.14];
-  const zBack = -depthZ * 0.5 + 0.14;
-  const zFront = depthZ * 0.5 - 0.14;
+  const zCorners = [-depthZ * 0.5 + 0.14, depthZ * 0.5 - 0.14];
 
-  // Background rear pillars (framing the machine without blocking sightlines)
   for (const cx of xCorners) {
-    const rearPillar = new THREE.Mesh(rearPillarGeo, castMat);
-    rearPillar.position.set(cx, heightY * 0.5, zBack);
-    rearPillar.castShadow = true;
-    rearPillar.receiveShadow = true;
-    casingGroup.add(rearPillar);
-
-    // Front low mounting pedestals (low profile, never crosses machine or gears)
-    const frontLug = new THREE.Mesh(frontLugGeo, castMat);
-    frontLug.position.set(cx, 0.65 * 0.5, zFront);
-    frontLug.castShadow = true;
-    frontLug.receiveShadow = true;
-    casingGroup.add(frontLug);
+    for (const cz of zCorners) {
+      const pillar = new THREE.Mesh(pillarGeo, castMat);
+      pillar.position.set(cx, heightY * 0.5, cz);
+      pillar.castShadow = true;
+      pillar.receiveShadow = true;
+      casingGroup.add(pillar);
+    }
   }
 
-  // 2. Base Perimeter Flange Rails & Stiffeners (Sturdy cast machine bed)
+  // 2. Base Perimeter Flange Rails & Stiffeners
   const railH = 0.28;
   const railXGeo = new THREE.BoxGeometry(widthX, railH, 0.28);
   const rFront = new THREE.Mesh(railXGeo, castMat);
@@ -2844,69 +2604,59 @@ function createGearboxCasing(options = {}) {
   rRight.castShadow = true;
   casingGroup.add(rRight);
 
-  // 3. Compact Industrial Inspection Cover & Lifting Eye (Snug Machine Cap, NOT an Oversized Roof)
-  // Background rear cross-tie beam connecting the two rear pillars
-  const tieGeo = new THREE.BoxGeometry(widthX - 0.28, 0.20, 0.20);
-  const tieBeam = new THREE.Mesh(tieGeo, castMat);
-  tieBeam.position.set(0, heightY, zBack);
-  tieBeam.castShadow = true;
-  casingGroup.add(tieBeam);
-
-  // Compact inspection lid mounted on the rear casting bridge
-  const lidH = 0.16;
-  const coverW = Math.min(widthX * 0.45, 2.2);
-  const coverD = Math.min(depthZ * 0.26, 1.8);
-  const topCoverZ = zBack + coverD * 0.5;
-  const topCoverGeo = new THREE.BoxGeometry(coverW, lidH, coverD);
+  // 3. Heavy Top Cover Lid with Inspection Service Hatch & Lifting Eye
+  const lidH = 0.28;
+  const topCoverGeo = new THREE.BoxGeometry(widthX + 0.24, lidH, depthZ + 0.24);
   const topCoverMesh = new THREE.Mesh(topCoverGeo, castMat);
-  topCoverMesh.position.set(0, heightY + lidH * 0.5, topCoverZ);
+  topCoverMesh.position.set(0, heightY + lidH * 0.5, 0);
   topCoverMesh.castShadow = true;
   topCoverMesh.receiveShadow = true;
   casingGroup.add(topCoverMesh);
 
-  // Top Inspection Service Cover (Raised cast plate with perimeter bolts)
-  const hatchGeo = new THREE.BoxGeometry(coverW * 0.72, 0.06, coverD * 0.65);
+  // Top Inspection Service Cover (Raised rectangular plate with perimeter bolts)
+  const hatchGeo = new THREE.BoxGeometry(widthX * 0.75, 0.08, depthZ * 0.45);
   const hatchMat = new THREE.MeshStandardMaterial({
-    color: 0x3d5249,
-    metalness: 0.72,
-    roughness: 0.38,
+    color: 0x303947,
+    metalness: 0.82,
+    roughness: 0.42,
   });
   const hatchMesh = new THREE.Mesh(hatchGeo, hatchMat);
-  hatchMesh.position.set(0, heightY + lidH + 0.03, topCoverZ);
+  hatchMesh.position.set(0, heightY + lidH + 0.04, 0);
   hatchMesh.castShadow = true;
   casingGroup.add(hatchMesh);
 
   // Inspection Cover Fastener Bolts (4 corners)
-  const hx = coverW * 0.28;
-  const hz = coverD * 0.24;
+  const hx = widthX * 0.32;
+  const hz = depthZ * 0.18;
   const hatchBoltCorners = [
     [-hx, -hz], [hx, -hz], [-hx, hz], [hx, hz]
   ];
   for (const [cx, cz] of hatchBoltCorners) {
     const hBolt = new THREE.Mesh(hexBoltGeo, boltMat);
-    hBolt.position.set(cx, heightY + lidH + 0.06 + 0.03, topCoverZ + cz);
+    hBolt.position.set(cx, heightY + lidH + 0.08 + 0.04, cz);
     hBolt.castShadow = true;
     casingGroup.add(hBolt);
   }
 
-  // Heavy Drop-Forged Steel Lifting Eye Bolt on top
+  // Heavy Drop-Forged Steel Lifting Eye Bolt on top center
   const eyeBase = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.16, 0.20, 0.10, 18),
+    new THREE.CylinderGeometry(0.22, 0.26, 0.14, 18),
     new THREE.MeshStandardMaterial({ color: 0x6e7b8a, metalness: 0.90, roughness: 0.25 })
   );
-  eyeBase.position.set(0, heightY + lidH + 0.06 + 0.05, topCoverZ);
+  eyeBase.position.set(0, heightY + lidH + 0.08 + 0.07, 0);
   eyeBase.castShadow = true;
   casingGroup.add(eyeBase);
 
   const eyeTorus = new THREE.Mesh(
-    new THREE.TorusGeometry(0.20, 0.055, 16, 24),
+    new THREE.TorusGeometry(0.28, 0.075, 16, 24),
     new THREE.MeshStandardMaterial({ color: 0x8a97a8, metalness: 0.94, roughness: 0.20 })
   );
-  eyeTorus.position.set(0, heightY + lidH + 0.06 + 0.24, topCoverZ);
+  eyeTorus.position.set(0, heightY + lidH + 0.08 + 0.38, 0);
   eyeTorus.castShadow = true;
   casingGroup.add(eyeTorus);
 
-  // 4. Background Rear Inspection Window Panel
+  // 5. Optical Inspection Windows & Steel Retaining Bezels (Front & Back)
+  // Ensures 100% crystal-clear visibility of all meshing teeth while preserving industrial housing
   const windowMat = new THREE.MeshStandardMaterial({
     color: panelColor,
     transparent: true,
@@ -2917,21 +2667,27 @@ function createGearboxCasing(options = {}) {
     side: THREE.DoubleSide,
   });
 
-  const backWindow = new THREE.Mesh(
-    new THREE.PlaneGeometry(widthX - 0.28, heightY - 0.6),
-    windowMat
-  );
+  const windowGeo = new THREE.PlaneGeometry(widthX - 0.28, heightY - 0.6);
+  const frontWindow = new THREE.Mesh(windowGeo, windowMat);
+  frontWindow.position.set(0, heightY * 0.5 + 0.1, depthZ * 0.5 - 0.02);
+  casingGroup.add(frontWindow);
+
+  const backWindow = new THREE.Mesh(windowGeo, windowMat);
   backWindow.position.set(0, heightY * 0.5 + 0.1, -depthZ * 0.5 + 0.02);
   backWindow.rotation.y = Math.PI;
   casingGroup.add(backWindow);
 
-  // Retaining Base Bezel (Low trim rail on the base)
+  // Retaining Bezel Framing around Front Inspection Window
   const bezelMat = new THREE.MeshStandardMaterial({
-    color: 0x3a4b44,
-    metalness: 0.75,
+    color: 0x1a212b,
+    metalness: 0.88,
     roughness: 0.35,
   });
   const bezelBarH = new THREE.BoxGeometry(widthX - 0.18, 0.08, 0.04);
+  const bezelTop = new THREE.Mesh(bezelBarH, bezelMat);
+  bezelTop.position.set(0, heightY - 0.25, depthZ * 0.5 + 0.01);
+  casingGroup.add(bezelTop);
+
   const bezelBottom = new THREE.Mesh(bezelBarH, bezelMat);
   bezelBottom.position.set(0, 0.35, depthZ * 0.5 + 0.01);
   casingGroup.add(bezelBottom);
@@ -3126,51 +2882,6 @@ function createLabel(text, options = {}) {
 }
 
 /**
- * Creates a subtle curved directional arc indicator with arrowhead.
- * Shows rotation direction (CW or CCW) on gear face for beginner learning.
- *
- * @param {number} radius - Arc radius
- * @param {boolean} isClockwise - true for CW, false for CCW
- * @param {number} color - Hex color
- * @returns {THREE.Group} Direction arrow group
- */
-function createDirectionIndicator(radius = 1.6, isClockwise = true, color = 0xf59e0b) {
-  const dirGroup = new THREE.Group();
-
-  // 1. Semi-circular arc ring (about 120 degrees = 2.09 rad)
-  const arcLength = Math.PI * 0.70;
-  const ringGeo = new THREE.RingGeometry(radius - 0.07, radius + 0.07, 28, 1, 0, arcLength);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: color,
-    transparent: true,
-    opacity: 0.65,
-    side: THREE.DoubleSide,
-    depthWrite: false,
-  });
-  const arcMesh = new THREE.Mesh(ringGeo, ringMat);
-  dirGroup.add(arcMesh);
-
-  // 2. Arrowhead cone at the end of arc
-  const arrowGeo = new THREE.ConeGeometry(0.18, 0.40, 3);
-  const arrowMat = new THREE.MeshBasicMaterial({
-    color: color,
-    transparent: true,
-    opacity: 0.85,
-    depthWrite: false,
-  });
-  const arrowMesh = new THREE.Mesh(arrowGeo, arrowMat);
-  const tipAngle = arcLength;
-  arrowMesh.position.set(radius * Math.cos(tipAngle), radius * Math.sin(tipAngle), 0);
-  arrowMesh.rotation.z = tipAngle + (isClockwise ? -Math.PI / 2 : Math.PI / 2);
-  dirGroup.add(arrowMesh);
-
-  // Face perpendicular to X axis
-  dirGroup.rotation.y = Math.PI / 2;
-  dirGroup.userData = { isDirectionArrow: true, isClockwise };
-  return dirGroup;
-}
-
-/**
  * Rebuilds the complete 3D industrial gearbox assembly with safe internal clearances.
  * @param {THREE.Scene} scene - Scene to assemble components in
  * @param {Object} state - Main simulation state
@@ -3238,8 +2949,6 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
   if (oldAssembly.outputGear) scene.remove(oldAssembly.outputGear);
   if (oldAssembly.inputSlotMarker) scene.remove(oldAssembly.inputSlotMarker);
   if (oldAssembly.outputSlotMarker) scene.remove(oldAssembly.outputSlotMarker);
-  if (oldAssembly.inputDirectionArrow) scene.remove(oldAssembly.inputDirectionArrow);
-  if (oldAssembly.outputDirectionArrow) scene.remove(oldAssembly.outputDirectionArrow);
   if (oldAssembly.gearboxCasing) scene.remove(oldAssembly.gearboxCasing);
   if (oldAssembly.labelsGroup) scene.remove(oldAssembly.labelsGroup);
   if (oldAssembly.engagementContactFlash) scene.remove(oldAssembly.engagementContactFlash);
@@ -3273,42 +2982,35 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
   });
   motor.position.set(motorX, shaftY, posZInput);
   scene.add(motor);
-  const motorShaft = motor.userData.shaftGroup;  // 9. Create Input Shaft (Polished chrome steel)
+  const motorShaft = motor.userData.shaftGroup;
+
+  // 9. Create Input Shaft
   const inputShaftTotalLength = casingInternalWidthX + 1.4;
   const inputShaftCenterX = -0.7;
   const inputShaft = createShaft({
     radius: 0.32,
     length: inputShaftTotalLength,
-    color: 0xe8f0f8,
-    metalness: 0.95,
-    roughness: 0.15,
+    color: 0x94a3b8,
     hasCoupling: true,
   });
   inputShaft.position.set(inputShaftCenterX, shaftY, posZInput);
   scene.add(inputShaft);
 
-  // 10. Create Input Gear (High-clarity precision machined steel, CW) or Slot Locator Ring
+  // 10. Create Input Gear (Case-hardened nitrided tool steel, CW) or Slot Locator Ring
   let inputGear = null;
   let inputSlotMarker = null;
-  let inputDirectionArrow = null;
   if (selectedInputTeeth) {
     inputGear = createSpurGear({
       teeth: selectedInputTeeth,
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.42,
-      color: 0xd8e4f0, // Polished high-clarity mechanical steel
-      metalness: 0.92,
-      roughness: 0.20,
+      color: 0x928472, // Tempered case-hardened bronze/nitride tool steel
+      metalness: 0.86,
+      roughness: 0.28,
     });
     inputGear.position.set(0, shaftY, posZInput);
     scene.add(inputGear);
-
-    // Subtle CW Direction Indicator Arrow
-    const inArrowRadius = Math.max(0.85, inDim.pitchRadius * 0.70);
-    inputDirectionArrow = createDirectionIndicator(inArrowRadius, true, 0xf59e0b);
-    inputDirectionArrow.position.set(0.38, shaftY, posZInput);
-    scene.add(inputDirectionArrow);
   } else {
     // 3D Input Shaft Placement Slot Locator Ring
     const slotGeo = new THREE.TorusGeometry(0.55, 0.05, 12, 32);
@@ -3325,10 +3027,9 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
     scene.add(inputSlotMarker);
   }
 
-  // 11. Create Output Gear (High-clarity precision machined steel, CCW) or Slot Locator Ring
+  // 11. Create Output Gear (Precision machined hardened alloy steel, CCW) or Slot Locator Ring
   let outputGear = null;
   let outputSlotMarker = null;
-  let outputDirectionArrow = null;
   let initialPhaseOutput = 0.0;
   if (selectedOutputTeeth) {
     outputGear = createSpurGear({
@@ -3336,21 +3037,15 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
       module: GEAR_MODULE,
       thickness: 0.65,
       boreRadius: 0.50,
-      color: 0xd0dce8, // Polished high-clarity mechanical steel
-      metalness: 0.92,
-      roughness: 0.22,
+      color: 0x75879a, // Precision ground hardened alloy steel
+      metalness: 0.89,
+      roughness: 0.24,
     });
     outputGear.position.set(0, shaftY, posZOutput);
     scene.add(outputGear);
 
     initialPhaseOutput = Math.PI / selectedOutputTeeth;
     outputGear.rotation.x = initialPhaseOutput;
-
-    // Subtle CCW Direction Indicator Arrow
-    const outArrowRadius = Math.max(0.85, outDim.pitchRadius * 0.70);
-    outputDirectionArrow = createDirectionIndicator(outArrowRadius, false, 0x38bdf8);
-    outputDirectionArrow.position.set(0.38, shaftY, posZOutput);
-    scene.add(outputDirectionArrow);
   } else {
     // 3D Output Shaft Placement Slot Locator Ring
     const slotGeo = new THREE.TorusGeometry(0.65, 0.05, 12, 32);
@@ -3380,15 +3075,13 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
   engagementContactFlash.position.set(0, shaftY, (posZInput + posZOutput) * 0.5);
   scene.add(engagementContactFlash);
 
-  // 12. Create Output Shaft (Polished chrome steel)
+  // 12. Create Output Shaft
   const outputShaftTotalLength = casingInternalWidthX + 6.0;
   const outputShaftCenterX = 3.0;
   const outputShaft = createShaft({
     radius: 0.40,
     length: outputShaftTotalLength,
-    color: 0xe8f0f8,
-    metalness: 0.95,
-    roughness: 0.15,
+    color: 0x8a95a5,
     hasCoupling: false,
   });
   outputShaft.position.set(outputShaftCenterX, shaftY, posZOutput);
@@ -3406,7 +3099,7 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
     width: 0.34,
     ballCount: 10,
     targetShaft: 'input',
-    housingColor: 0x32463e,
+    housingColor: 0x384452,
     flangeFacing: 1,
   });
   inputSupportLeft.position.set(-bearingX, shaftY, posZInput);
@@ -3420,7 +3113,7 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
     width: 0.34,
     ballCount: 10,
     targetShaft: 'input',
-    housingColor: 0x32463e,
+    housingColor: 0x384452,
     flangeFacing: -1,
   });
   inputSupportRight.position.set(bearingX, shaftY, posZInput);
@@ -3435,7 +3128,7 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
     width: 0.38,
     ballCount: 10,
     targetShaft: 'output',
-    housingColor: 0x32463e,
+    housingColor: 0x384452,
     flangeFacing: 1,
   });
   outputSupportLeft.position.set(-bearingX, shaftY, posZOutput);
@@ -3449,7 +3142,7 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
     width: 0.38,
     ballCount: 10,
     targetShaft: 'output',
-    housingColor: 0x32463e,
+    housingColor: 0x384452,
     flangeFacing: -1,
   });
   outputSupportRight.position.set(bearingX, shaftY, posZOutput);
@@ -3467,9 +3160,9 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
   labelMotor.position.set(motorX, shaftY + 2.5, posZInput);
   labelsGroup.add(labelMotor);
 
-  const labelInShaft = createLabel('MOTOR SHAFT', {
+  const labelInShaft = createLabel('INPUT SHAFT', {
     borderColor: '#e5a93c',
-    subtext: 'Coupled • CW Rotation ↻',
+    subtext: 'Coupled • CW Rotation',
     scale: 0.90,
   });
   labelInShaft.position.set(-inputShaftTotalLength * 0.4, shaftY + 1.4, posZInput);
@@ -3477,7 +3170,7 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
 
   const labelInGear = createLabel('INPUT GEAR', {
     borderColor: '#e5a93c',
-    subtext: selectedInputTeeth ? `${selectedInputTeeth}T Drive Gear • ↻ CW` : 'Unmounted • Bare Shaft',
+    subtext: selectedInputTeeth ? `${selectedInputTeeth}T Selected • Brass Gold` : 'Unmounted • Bare Shaft',
     scale: 0.90,
   });
   labelInGear.position.set(0, shaftY + inDim.gearOuterRadius + 1.2, posZInput);
@@ -3485,15 +3178,15 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
 
   const labelOutGear = createLabel('OUTPUT GEAR', {
     borderColor: '#60a5fa',
-    subtext: selectedOutputTeeth ? `${selectedOutputTeeth}T Driven Gear • ↺ CCW` : 'Unmounted • Bare Shaft',
+    subtext: selectedOutputTeeth ? `${selectedOutputTeeth}T Selected • Chrome Steel` : 'Unmounted • Bare Shaft',
     scale: 0.90,
   });
   labelOutGear.position.set(0, shaftY + outDim.gearOuterRadius + 1.2, posZOutput);
   labelsGroup.add(labelOutGear);
 
-  const labelOutShaft = createLabel('MACHINE SHAFT', {
+  const labelOutShaft = createLabel('OUTPUT SHAFT', {
     borderColor: '#60a5fa',
-    subtext: 'Output Drive • CCW Rotation ↺',
+    subtext: 'Extended Output Drive • CCW',
     scale: 0.90,
   });
   labelOutShaft.position.set(casingInternalWidthX * 0.5 + 2.8, shaftY + 1.4, posZOutput);
@@ -3538,8 +3231,6 @@ function buildGearTrain(scene, state, selectedInputTeeth = 20, selectedOutputTee
     outputGear,
     inputSlotMarker,
     outputSlotMarker,
-    inputDirectionArrow,
-    outputDirectionArrow,
     gearboxCasing,
     labelsGroup,
     bearingSupports,
@@ -3606,10 +3297,6 @@ const elements = {
   btnPrevLevel: document.getElementById('btn-prev-level'),
   btnNextLevel: document.getElementById('btn-next-level'),
   btnClearSelection: document.getElementById('btn-clear-selection'),
-  btnHeaderPrevLevel: document.getElementById('btn-header-prev-level'),
-  btnHeaderNextLevel: document.getElementById('btn-header-next-level'),
-  headerLevelText: document.getElementById('header-level-text'),
-  btnHowItWorksAction: document.getElementById('btn-how-it-works-action'),
 
   // Banners
   puzzleSuccessBanner: document.getElementById('puzzle-success-banner'),
@@ -3706,30 +3393,6 @@ const elements = {
   // Tutorial Dock & Modal
   tutorialDock: document.getElementById('tutorial-dock'),
   tutorialModal: document.getElementById('tutorial-modal'),
-
-  // Phase 11: Beginner-Friendly Guidance & Onboarding Elements
-  btnRpmInfo: document.getElementById('btn-rpm-info'),
-  rpmInfoModal: document.getElementById('rpm-info-modal'),
-  btnCloseRpmInfo: document.getElementById('btn-close-rpm-info'),
-  btnGotRpmInfo: document.getElementById('btn-got-rpm-info'),
-
-  welcomeModal: document.getElementById('welcome-modal'),
-  btnWelcomeStart: document.getElementById('btn-welcome-start'),
-
-  howGearsWorkModal: document.getElementById('how-gears-work-modal'),
-  btnCloseHowGears: document.getElementById('btn-close-how-gears'),
-  btnHowGearsPrev: document.getElementById('btn-how-gears-prev'),
-  btnHowGearsNext: document.getElementById('btn-how-gears-next'),
-  howGearsGuideTitle: document.getElementById('how-gears-guide-title'),
-  howGearsBody: document.getElementById('how-gears-body'),
-  howGearsDots: document.getElementById('how-gears-dots'),
-
-  missionVisualHint: document.getElementById('mission-visual-hint'),
-  missionObjectiveText: document.getElementById('mission-objective-text'),
-  contextualHintBar: document.getElementById('contextual-hint-bar'),
-  contextualHintText: document.getElementById('contextual-hint-text'),
-  introVisualHint: document.getElementById('intro-visual-hint'),
-  introTeachMsg: document.getElementById('intro-teach-msg'),
 };
 
 /**
@@ -3771,10 +3434,7 @@ function initUI(handlers = {}) {
   elements.btnResetLevel?.addEventListener('click', () => onResetLevel && onResetLevel());
   elements.btnPrevLevel?.addEventListener('click', () => onPrevLevel && onPrevLevel());
   elements.btnNextLevel?.addEventListener('click', () => onNextLevel && onNextLevel());
-  elements.btnHeaderPrevLevel?.addEventListener('click', () => onPrevLevel && onPrevLevel());
-  elements.btnHeaderNextLevel?.addEventListener('click', () => onNextLevel && onNextLevel());
   elements.btnClearSelection?.addEventListener('click', () => onClearSelection && onClearSelection());
-  elements.btnHowItWorksAction?.addEventListener('click', () => openHowGearsModal(0));
 
   // Phase 2 Slot Buttons
   elements.btnPlaceInput?.addEventListener('click', (e) => {
@@ -3884,33 +3544,6 @@ function initUI(handlers = {}) {
   });
   elements.btnToggleMusic?.addEventListener('click', () => {
     if (handlers.onToggleMusic) handlers.onToggleMusic();
-  });
-
-  // Phase 11: Beginner-Friendly Guidance & Onboarding Listeners
-  elements.btnRpmInfo?.addEventListener('click', () => openRpmInfoModal());
-  elements.btnCloseRpmInfo?.addEventListener('click', () => closeRpmInfoModal());
-  elements.btnGotRpmInfo?.addEventListener('click', () => closeRpmInfoModal());
-  elements.rpmInfoModal?.addEventListener('click', (e) => {
-    if (e.target === elements.rpmInfoModal) closeRpmInfoModal();
-  });
-
-  elements.btnWelcomeStart?.addEventListener('click', () => {
-    closeWelcomeModal();
-    try {
-      localStorage.setItem('gearfactory_welcomed', 'true');
-      localStorage.setItem('gear_factory_has_seen_welcome', 'true');
-    } catch (e) {}
-    if (handlers.onWelcomeStart) handlers.onWelcomeStart();
-  });
-  elements.welcomeModal?.addEventListener('click', (e) => {
-    if (e.target === elements.welcomeModal) closeWelcomeModal();
-  });
-
-  elements.btnCloseHowGears?.addEventListener('click', () => closeHowGearsModal());
-  elements.btnHowGearsPrev?.addEventListener('click', () => prevHowGearsPage());
-  elements.btnHowGearsNext?.addEventListener('click', () => nextHowGearsPage());
-  elements.howGearsWorkModal?.addEventListener('click', (e) => {
-    if (e.target === elements.howGearsWorkModal) closeHowGearsModal();
   });
 
   // Available Gear Inventory Binding
@@ -4043,15 +3676,15 @@ function updateVerificationUI(selectedInputTeeth, selectedOutputTeeth, targetRPM
   if (hasChecked && calculatedRPM !== null) {
     if (elements.puzzleCalculatedOutputRpm) {
       elements.puzzleCalculatedOutputRpm.textContent = `${calculatedRPM.toFixed(1)} RPM`;
-      elements.puzzleCalculatedOutputRpm.style.color = isPass ? '#34d399' : '#f59e0b';
+      elements.puzzleCalculatedOutputRpm.style.color = isPass ? '#34d399' : '#f87171';
     }
     if (elements.verificationStatusPill) {
-      elements.verificationStatusPill.textContent = isPass ? 'PERFECT' : 'NOT QUITE';
+      elements.verificationStatusPill.textContent = isPass ? 'PASS' : 'FAIL';
       elements.verificationStatusPill.className = `verification-status-pill ${isPass ? 'status-complete' : 'status-try-again'}`;
     }
     if (elements.puzzleStatusVal) {
-      elements.puzzleStatusVal.textContent = isPass ? 'SPEED MATCH (PERFECT)' : 'SPEED MISMATCH (NOT QUITE)';
-      elements.puzzleStatusVal.style.color = isPass ? '#34d399' : '#f59e0b';
+      elements.puzzleStatusVal.textContent = isPass ? 'MATCH (PASS)' : 'RPM MISMATCH (FAIL)';
+      elements.puzzleStatusVal.style.color = isPass ? '#34d399' : '#f87171';
     }
   } else {
     if (elements.puzzleCalculatedOutputRpm) {
@@ -4091,10 +3724,6 @@ function showSuccessBanner(message) {
   if (elements.puzzleFailBanner) {
     elements.puzzleFailBanner.style.display = 'none';
   }
-  // Subtle tactile feedback on supported devices
-  if (typeof navigator !== 'undefined' && navigator.vibrate) {
-    try { navigator.vibrate(50); } catch (e) {}
-  }
 }
 
 function showFailBanner(message) {
@@ -4115,9 +3744,9 @@ function hideBanners() {
 }
 
 /**
- * Updates level objective badges (Current Level, Motor Input RPM, Target RPM, Visual Hint, Objective).
+ * Updates level objective badges (Current Level, Motor Input RPM, Target RPM).
  */
-function updateLevelObjectiveUI(levelNumber, totalLevels, inputRPM, targetRPM, difficulty = 'EASY', objective = '', visualHint = '') {
+function updateLevelObjectiveUI(levelNumber, totalLevels, inputRPM, targetRPM, difficulty = 'EASY', objective = '') {
   if (elements.puzzleLevelIndicator) {
     elements.puzzleLevelIndicator.textContent = `Level ${levelNumber} of ${totalLevels} • ${difficulty}`;
   }
@@ -4127,27 +3756,8 @@ function updateLevelObjectiveUI(levelNumber, totalLevels, inputRPM, targetRPM, d
   if (elements.puzzleTargetOutputRpm) {
     elements.puzzleTargetOutputRpm.textContent = targetRPM.toFixed(0);
   }
-  if (elements.missionVisualHint && visualHint) {
-    elements.missionVisualHint.textContent = visualHint;
-  }
-  if (elements.missionObjectiveText && objective) {
-    elements.missionObjectiveText.textContent = objective;
-  }
   if (elements.btnPrevLevel) {
     elements.btnPrevLevel.disabled = levelNumber <= 1;
-  }
-  if (elements.btnHeaderPrevLevel) {
-    elements.btnHeaderPrevLevel.disabled = levelNumber <= 1;
-  }
-  if (elements.headerLevelText) {
-    elements.headerLevelText.textContent = `LEVEL ${levelNumber}`;
-  }
-
-  // Soft guidance pulse on empty shafts for beginner levels 1–5
-  if (elements.inputShaftSlot && elements.outputShaftSlot) {
-    const isBeginner = levelNumber <= 5;
-    elements.inputShaftSlot.classList.toggle('beginner-guidance-pulse', isBeginner && !elements.inputShaftSlot.classList.contains('mounted'));
-    elements.outputShaftSlot.classList.toggle('beginner-guidance-pulse', isBeginner && !elements.outputShaftSlot.classList.contains('mounted'));
   }
 }
 
@@ -4353,13 +3963,7 @@ function showLevelIntro(level, onStart) {
     elements.introTierBadge.textContent = level.difficulty || 'BEGINNER';
   }
   if (elements.introLevelTitle) {
-    elements.introLevelTitle.textContent = level.title || `LEVEL ${level.level}`;
-  }
-  if (elements.introVisualHint) {
-    elements.introVisualHint.textContent = level.visualHint || '⚙️ MECHANICAL PUZZLE';
-  }
-  if (elements.introTeachMsg) {
-    elements.introTeachMsg.textContent = level.teachMessage || level.objective || "Match the target machine speed.";
+    elements.introLevelTitle.textContent = `LEVEL ${level.level}`;
   }
   if (elements.introTargetRpm) {
     elements.introTargetRpm.textContent = `${level.targetRPM} RPM`;
@@ -4443,168 +4047,6 @@ function updateTimerDisplay(totalSeconds) {
   }
   return formatted;
 }
-
-// ==========================================
-// Phase 11: Contextual Hint & Onboarding Modals
-// ==========================================
-
-function updateContextualHintUI(hintText) {
-  if (elements.contextualHintText && hintText) {
-    elements.contextualHintText.textContent = hintText;
-    if (elements.contextualHintBar) {
-      elements.contextualHintBar.classList.add('hint-highlight');
-      setTimeout(() => {
-        elements.contextualHintBar?.classList.remove('hint-highlight');
-      }, 1500);
-    }
-  }
-}
-
-function openRpmInfoModal() {
-  if (elements.rpmInfoModal) {
-    elements.rpmInfoModal.classList.add('active');
-    elements.rpmInfoModal.style.display = 'flex';
-  }
-}
-
-function closeRpmInfoModal() {
-  if (elements.rpmInfoModal) {
-    elements.rpmInfoModal.classList.remove('active');
-    elements.rpmInfoModal.style.display = 'none';
-  }
-}
-
-function openWelcomeModal() {
-  closeMainMenu();
-  closeLevelIntro();
-  if (elements.welcomeModal) {
-    elements.welcomeModal.classList.add('active');
-    elements.welcomeModal.style.display = 'flex';
-  }
-}
-
-function closeWelcomeModal() {
-  if (elements.welcomeModal) {
-    elements.welcomeModal.classList.remove('active');
-    elements.welcomeModal.style.display = 'none';
-  }
-}
-
-function checkFirstTimeWelcome(onStart) {
-  try {
-    const welcomed = localStorage.getItem('gearfactory_welcomed') || localStorage.getItem('gear_factory_has_seen_welcome');
-    if (!welcomed) {
-      openWelcomeModal();
-      return true;
-    }
-  } catch (e) {}
-  return false;
-}
-
-let currentHowGearsPage = 0;
-
-const howGearsPages = [
-  {
-    title: 'Small Gear',
-    svg: `<svg viewBox="0 0 100 100" width="90" height="90">
-      <circle cx="50" cy="50" r="30" fill="#1e293b" stroke="#f59e0b" stroke-width="4" stroke-dasharray="6,4"/>
-      <circle cx="50" cy="50" r="10" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
-      <text x="50" y="55" font-size="13" font-family="sans-serif" font-weight="bold" fill="#f59e0b" text-anchor="middle">10T</text>
-      <path d="M50 12 A38 38 0 0 1 82 32" fill="none" stroke="#38bdf8" stroke-width="3"/>
-    </svg>`,
-    desc: 'Small gears have fewer teeth. Small gears can spin faster.'
-  },
-  {
-    title: 'Big Gear',
-    svg: `<svg viewBox="0 0 100 100" width="90" height="90">
-      <circle cx="50" cy="50" r="42" fill="#1e293b" stroke="#94a3b8" stroke-width="5" stroke-dasharray="8,5"/>
-      <circle cx="50" cy="50" r="14" fill="#0f172a" stroke="#94a3b8" stroke-width="2"/>
-      <text x="50" y="56" font-size="15" font-family="sans-serif" font-weight="bold" fill="#f1f5f9" text-anchor="middle">40T</text>
-      <path d="M50 6 A44 44 0 0 1 76 16" fill="none" stroke="#94a3b8" stroke-width="3"/>
-    </svg>`,
-    desc: 'Big gears have more teeth. Big gears can spin slower.'
-  },
-  {
-    title: 'Two Gears',
-    svg: `<svg viewBox="0 0 120 70" width="120" height="70">
-      <circle cx="35" cy="35" r="22" fill="#1e293b" stroke="#f59e0b" stroke-width="3"/>
-      <text x="35" y="39" font-size="9" font-weight="bold" fill="#f59e0b" text-anchor="middle">CW ↻</text>
-      <circle cx="85" cy="35" r="22" fill="#1e293b" stroke="#38bdf8" stroke-width="3"/>
-      <text x="85" y="39" font-size="9" font-weight="bold" fill="#38bdf8" text-anchor="middle">CCW ↺</text>
-    </svg>`,
-    desc: 'When gears touch, they transfer movement in opposite directions.'
-  },
-  {
-    title: 'Your Turn',
-    svg: `<svg viewBox="0 0 100 70" width="100" height="70">
-      <rect x="10" y="15" width="80" height="40" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="3"/>
-      <text x="50" y="39" font-size="11" font-weight="bold" fill="#4ade80" text-anchor="middle">MATCH SPEED</text>
-    </svg>`,
-    desc: 'Try different gears and watch how speed changes to make the machine run!'
-  }
-];
-
-function openHowGearsModal(page = 0) {
-  closeMainMenu();
-  closeLevelIntro();
-  currentHowGearsPage = Math.max(0, Math.min(page, howGearsPages.length - 1));
-  renderHowGearsPage(currentHowGearsPage);
-  if (elements.howGearsWorkModal) {
-    elements.howGearsWorkModal.classList.add('active');
-    elements.howGearsWorkModal.style.display = 'flex';
-  }
-}
-
-function closeHowGearsModal() {
-  if (elements.howGearsWorkModal) {
-    elements.howGearsWorkModal.classList.remove('active');
-    elements.howGearsWorkModal.style.display = 'none';
-  }
-}
-
-function renderHowGearsPage(index) {
-  currentHowGearsPage = index;
-  const p = howGearsPages[index];
-  if (!p) return;
-
-  if (elements.howGearsGuideTitle) {
-    elements.howGearsGuideTitle.textContent = p.title;
-  }
-  if (elements.howGearsBody) {
-    elements.howGearsBody.innerHTML = `
-      <div class="how-gears-illustration">${p.svg}</div>
-      <div class="how-gears-page-title">${p.title}</div>
-      <p class="how-gears-page-desc">${p.desc}</p>
-    `;
-  }
-  if (elements.howGearsDots) {
-    const dots = elements.howGearsDots.querySelectorAll('.h-dot');
-    dots.forEach((d, i) => {
-      d.classList.toggle('active', i === index);
-    });
-  }
-  if (elements.btnHowGearsPrev) {
-    elements.btnHowGearsPrev.disabled = index <= 0;
-  }
-  if (elements.btnHowGearsNext) {
-    elements.btnHowGearsNext.textContent = index >= howGearsPages.length - 1 ? "LET'S PLAY" : "NEXT ➔";
-  }
-}
-
-function nextHowGearsPage() {
-  if (currentHowGearsPage < howGearsPages.length - 1) {
-    renderHowGearsPage(currentHowGearsPage + 1);
-  } else {
-    closeHowGearsModal();
-  }
-}
-
-function prevHowGearsPage() {
-  if (currentHowGearsPage > 0) {
-    renderHowGearsPage(currentHowGearsPage - 1);
-  }
-}
-
 // --- End: src/ui.js ---
 
 // --- Begin: src/drag-drop.js ---
@@ -5272,12 +4714,12 @@ function showTutorialStep(step) {
         modal.style.display = 'flex';
         modal.innerHTML = `
           <div class="tutorial-card">
-            <div class="modal-eyebrow">WORKSHOP TUTORIAL</div>
-            <h2 class="modal-title">HOW GEARS WORK</h2>
-            <p class="tutorial-desc">Learn how mechanical gears work in simple visual steps.</p>
+            <div class="modal-eyebrow">TUTORIAL MODE</div>
+            <h2 class="modal-title">GEAR FACTORY 3D</h2>
+            <p class="tutorial-desc">Learn how to build a mechanical gear train step-by-step.</p>
             <div class="tutorial-goal-box">
-              <span class="goal-label">YOUR GOAL:</span>
-              <span class="goal-text">Connect the gears to match the <strong>TARGET SPEED</strong> and run the machine.</span>
+              <span class="goal-label">MISSION GOAL:</span>
+              <span class="goal-text">Match the <strong>TARGET RPM</strong> by selecting and meshing the correct gear combination.</span>
             </div>
             <div class="tutorial-btn-row">
               <button type="button" class="btn-primary" id="btn-tut-start">START TUTORIAL</button>
@@ -5305,9 +4747,9 @@ function showTutorialStep(step) {
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 1 OF 6</span>
-            <span class="tut-step-title">1. The Electric Motor</span>
+            <span class="tut-step-title">1. Electric Drive Motor</span>
           </div>
-          <p class="tut-step-text">The electric motor powers the machine at a steady speed (e.g. <strong>1000 RPM</strong>). It turns the motor shaft continuously.</p>
+          <p class="tut-step-text">The heavy-duty electric motor delivers continuous rotational energy at a constant speed (e.g. <strong>1000 RPM</strong>). It powers the input drive shaft.</p>
           <div class="tut-actions">
             <button type="button" class="btn-tut-action btn-tut-next" id="btn-tut-step1-next">NEXT ➔</button>
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-1">SKIP</button>
@@ -5321,15 +4763,15 @@ function showTutorialStep(step) {
     }
 
     case 2: {
-      // Step 2: Choose Motor Gear (Concept 2)
+      // Step 2: Choose Input Gear (Concept 2)
       if (banner) {
         banner.style.display = 'flex';
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 2 OF 6</span>
-            <span class="tut-step-title">2. Choose a Gear</span>
+            <span class="tut-step-title">2. Input Pinion Selection</span>
           </div>
-          <p class="tut-step-text">Select a gear from your inventory (e.g. <strong>20T</strong>). The number of teeth determines how big or small the gear is.</p>
+          <p class="tut-step-text">Select a drive pinion from your inventory (e.g. <strong>20T</strong>). Tooth count (<strong>Z_in</strong>) dictates mechanical leverage.</p>
           <div class="tut-actions">
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-2">SKIP</button>
           </div>
@@ -5341,19 +4783,19 @@ function showTutorialStep(step) {
     }
 
     case 3: {
-      // Step 3: Drag Gear to Motor Shaft (Concept 3)
+      // Step 3: Drag Gear to Input Shaft (Concept 3)
       if (banner) {
         banner.style.display = 'flex';
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 3 OF 6</span>
-            <span class="tut-step-title">3. Place on Motor Shaft</span>
+            <span class="tut-step-title">3. Gear Placement on Shaft</span>
           </div>
-          <p class="tut-step-text">Drag the gear into the machine and place it onto the <strong>MOTOR SHAFT</strong> (or click the Motor Gear slot card).</p>
+          <p class="tut-step-text">Drag the gear into the 3D scene and snap it onto the <strong>INPUT SHAFT</strong> keyway (or click the slot card).</p>
           <div class="tut-guide-animation">
-            <span class="tut-guide-chip">⚙ Selected Gear</span>
+            <span class="tut-guide-chip">⚙ Selected Pinion</span>
             <span class="tut-guide-arrow">➔</span>
-            <span class="tut-guide-target">Motor Shaft</span>
+            <span class="tut-guide-target">Input Drive Shaft</span>
           </div>
           <div class="tut-actions">
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-3">SKIP</button>
@@ -5366,15 +4808,15 @@ function showTutorialStep(step) {
     }
 
     case 4: {
-      // Step 4: Machine Gear (Concept 4)
+      // Step 4: Output Gear (Concept 4)
       if (banner) {
         banner.style.display = 'flex';
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 4 OF 6</span>
-            <span class="tut-step-title">4. Connect Machine Gear</span>
+            <span class="tut-step-title">4. Output Driven Gear</span>
           </div>
-          <p class="tut-step-text">Now select another gear (e.g. <strong>40T</strong>) and drag it to the <strong>MACHINE SHAFT</strong> to mesh them together.</p>
+          <p class="tut-step-text">Select the mating driven gear (e.g. <strong>40T</strong>) and drag it to the <strong>OUTPUT SHAFT</strong> to complete the train.</p>
           <div class="tut-actions">
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-4">SKIP</button>
           </div>
@@ -5386,17 +4828,17 @@ function showTutorialStep(step) {
     }
 
     case 5: {
-      // Step 5: Rotation & Speed (Concepts 5, 6, 7)
+      // Step 5: Rotation, Transmission & Gear Ratio (Concepts 5, 6, 7)
       if (banner) {
         banner.style.display = 'flex';
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 5 OF 6</span>
-            <span class="tut-step-title">5. Gears in Motion</span>
+            <span class="tut-step-title">5. Rotation • 6. RPM Transmission • 7. Gear Ratio</span>
           </div>
-          <p class="tut-step-text">The gears are touching! They turn in opposite directions. Big gears turn slower, and small gears turn faster.</p>
+          <p class="tut-step-text">Gears are engaged! CW motor drives CCW output. Transmission speed obeys the fundamental gear ratio:</p>
           <div class="tut-formula-box">
-            <code>Small Gear ➔ Faster Speed &nbsp;•&nbsp; Big Gear ➔ Slower Speed</code>
+            <code>Output RPM = Input RPM × (Z_in / Z_out)</code>
           </div>
           <div class="tut-actions">
             <button type="button" class="btn-tut-action btn-tut-next" id="btn-tut-step5-next">NEXT ➔</button>
@@ -5417,9 +4859,9 @@ function showTutorialStep(step) {
         banner.innerHTML = `
           <div class="tutorial-step-header">
             <span class="tut-step-badge">STEP 6 OF 6</span>
-            <span class="tut-step-title">6. Check Solution</span>
+            <span class="tut-step-title">8. Solution Verification</span>
           </div>
-          <p class="tut-step-text">Click <strong>CHECK SOLUTION</strong> to see if your machine speed matches the target speed!</p>
+          <p class="tut-step-text">Click <strong>CHECK SOLUTION</strong> to verify if the transmission speed matches the target RPM.</p>
           <div class="tut-actions">
             <button type="button" class="btn-tut-skip" id="btn-tut-skip-6">SKIP</button>
           </div>
@@ -5529,8 +4971,8 @@ setupLighting(scene);
 const controls = initControls(camera, renderer.domElement);
 
 // Ensure camera is cleanly framed on the meshing gears
-camera.position.set(-8.6, 6.5, 14.0);
-controls.target.set(0.0, 4.4, -0.4);
+camera.position.set(-7.5, 8.2, 12.0);
+controls.target.set(0, 5.3, -0.4);
 controls.update();
 
 // Assembly reference holder
@@ -5551,16 +4993,6 @@ function refreshAssembly() {
 
   if (currentAssembly.labelsGroup) {
     currentAssembly.labelsGroup.visible = isLabelsVisible;
-  }
-
-  // Phase 11: Direction Arrow Visibility
-  const currentLvl = getLevel(puzzleState.currentLevel);
-  const showArrows = isLabelsVisible || (currentLvl && (currentLvl.showDirectionArrows || currentLvl.level === 4));
-  if (currentAssembly.inputDirectionArrow) {
-    currentAssembly.inputDirectionArrow.visible = !!(showArrows && puzzleState.selectedInputTeeth);
-  }
-  if (currentAssembly.outputDirectionArrow) {
-    currentAssembly.outputDirectionArrow.visible = !!(showArrows && puzzleState.selectedOutputTeeth);
   }
 
   // Phase 5: Update 3D drag drop target positions
@@ -5813,18 +5245,8 @@ function loadLevel(levelNumber, skipIntro = false) {
     level.motorRPM || level.inputRPM,
     level.targetRPM,
     level.difficulty,
-    level.objective,
-    level.visualHint
+    level.objective
   );
-
-  // Phase 11: Initialize contextual hint for this level
-  updateContextualHintUI(getContextualHint({
-    level: level.level,
-    hasInput: !!puzzleState.selectedInputTeeth,
-    hasOutput: !!puzzleState.selectedOutputTeeth,
-    targetRPM: level.targetRPM,
-  }));
-
   updateSelectedGearsUI(
     puzzleState.selectedInputTeeth,
     puzzleState.selectedOutputTeeth,
@@ -5844,9 +5266,6 @@ function loadLevel(levelNumber, skipIntro = false) {
 
   if (elements.btnNextLevel) {
     elements.btnNextLevel.disabled = levelNumber >= getTotalLevels() || !isLevelUnlocked(levelNumber + 1);
-  }
-  if (elements.btnHeaderNextLevel) {
-    elements.btnHeaderNextLevel.disabled = levelNumber >= getTotalLevels() || !isLevelUnlocked(levelNumber + 1);
   }
 
   refreshAssembly();
@@ -6015,21 +5434,6 @@ function onSelectionChanged() {
     false
   );
 
-  // Phase 11: Dynamic contextual hint update upon gear mounting / dismounting
-  if (level) {
-    updateContextualHintUI(getContextualHint({
-      level: level.level,
-      hasInput: !!puzzleState.selectedInputTeeth,
-      hasOutput: !!puzzleState.selectedOutputTeeth,
-      inputTeeth: puzzleState.selectedInputTeeth,
-      outputTeeth: puzzleState.selectedOutputTeeth,
-      targetRPM: level.targetRPM,
-      calculatedRPM: puzzleState.lastCalculatedRPM,
-      isCorrect: puzzleState.isSolutionPass,
-      hasChecked: puzzleState.hasCheckedSolution,
-    }));
-  }
-
   hideBanners();
 
   if (!puzzleState.selectedInputTeeth && !puzzleState.selectedOutputTeeth) {
@@ -6041,7 +5445,6 @@ function onSelectionChanged() {
   }
 
   if (elements.btnNextLevel) elements.btnNextLevel.disabled = true;
-  if (elements.btnHeaderNextLevel) elements.btnHeaderNextLevel.disabled = true;
 
   refreshAssembly();
   recalculateKinetics();
@@ -6081,29 +5484,12 @@ function checkPuzzleSolution(isUserClick = true) {
     setPuzzleStatusUI('LEVEL COMPLETE', 'complete');
     const isFinalLevel = puzzleState.currentLevel >= getTotalLevels();
     if (elements.btnNextLevel) elements.btnNextLevel.disabled = isFinalLevel;
-    if (elements.btnHeaderNextLevel) elements.btnHeaderNextLevel.disabled = isFinalLevel;
     showSuccessBanner(
       isFinalLevel
-        ? `GRANDMASTER COMPLETE: Gears connected! Machine running perfectly at ${result.calculatedRPM.toFixed(1)} RPM!`
-        : `GEARS CONNECTED! Machine running at target speed: ${result.calculatedRPM.toFixed(1)} RPM!`
+        ? `GRANDMASTER COMPLETE: Calculated ${result.calculatedRPM.toFixed(1)} RPM matches target ${result.targetRPM.toFixed(1)} RPM!`
+        : `Calculated ${result.calculatedRPM.toFixed(1)} RPM matches target ${result.targetRPM.toFixed(1)} RPM (diff: ${result.diff.toFixed(2)} RPM).`
     );
     audio.playSuccess();
-
-    // Phase 11: Update hint to celebrate
-    const level = getLevel(puzzleState.currentLevel);
-    if (level) {
-      updateContextualHintUI(getContextualHint({
-        level: level.level,
-        hasInput: !!puzzleState.selectedInputTeeth,
-        hasOutput: !!puzzleState.selectedOutputTeeth,
-        inputTeeth: puzzleState.selectedInputTeeth,
-        outputTeeth: puzzleState.selectedOutputTeeth,
-        targetRPM: level.targetRPM,
-        calculatedRPM: result.calculatedRPM,
-        isCorrect: true,
-        hasChecked: true,
-      }));
-    }
 
     // Check if in tutorial step 6
     if (tutorialState.isActive && tutorialState.currentStep === 6) {
@@ -6126,30 +5512,8 @@ function checkPuzzleSolution(isUserClick = true) {
     if (elements.btnNextLevel) {
       elements.btnNextLevel.disabled = puzzleState.currentLevel >= getTotalLevels() || !isLevelUnlocked(puzzleState.currentLevel + 1);
     }
-    if (elements.btnHeaderNextLevel) {
-      elements.btnHeaderNextLevel.disabled = puzzleState.currentLevel >= getTotalLevels() || !isLevelUnlocked(puzzleState.currentLevel + 1);
-    }
-    const speedDiffText = result.calculatedRPM > result.targetRPM
-      ? 'Machine turns too fast! Try a larger machine gear or smaller motor gear.'
-      : 'Machine turns too slow! Try a smaller machine gear or larger motor gear.';
-    showFailBanner(`Not quite! ${speedDiffText}`);
+    showFailBanner(`Speed does not match target. Try another gear combination!`);
     audio.playError();
-
-    // Phase 11: Non-harsh contextual coaching hint
-    const level = getLevel(puzzleState.currentLevel);
-    if (level) {
-      updateContextualHintUI(getContextualHint({
-        level: level.level,
-        hasInput: !!puzzleState.selectedInputTeeth,
-        hasOutput: !!puzzleState.selectedOutputTeeth,
-        inputTeeth: puzzleState.selectedInputTeeth,
-        outputTeeth: puzzleState.selectedOutputTeeth,
-        targetRPM: level.targetRPM,
-        calculatedRPM: result.calculatedRPM,
-        isCorrect: false,
-        hasChecked: true,
-      }));
-    }
   }
 
   return result.isCorrect;
@@ -6228,15 +5592,7 @@ initUI({
   onOpenTutorial: () => {
     audio.playButtonClick();
     closeMainMenu();
-    openHowGearsModal();
-  },
-  onOpenRpmInfo: () => {
-    audio.playButtonClick();
-    openRpmInfoModal();
-  },
-  onWelcomeStart: () => {
-    audio.playButtonClick();
-    loadLevel(1, false);
+    startTutorial();
   },
   onTogglePause: () => {
     if (state.isPaused) resumeGame();
@@ -6349,11 +5705,6 @@ loadLevel(initialLevel);
 setRunningState(true);
 setLabelToggleUI(isLabelsVisible);
 
-// Phase 11: First-time player welcome modal check
-checkFirstTimeWelcome(() => {
-  loadLevel(1, false);
-});
-
 /* ==========================================================================
    4. Animation Loop & Kinetic Simulation
    ========================================================================== */
@@ -6459,25 +5810,6 @@ function animate(now = performance.now()) {
   }
   if (currentAssembly.outputSupportRight?.userData?.balls) {
     currentAssembly.outputSupportRight.userData.balls.rotation.x = outPhaseRot * 0.5;
-  }
-
-  // Phase 11: Direction Indicator Arrows Rotation
-  if (currentAssembly.inputDirectionArrow) {
-    currentAssembly.inputDirectionArrow.rotation.x = -kinetics.inputAngle;
-  }
-  if (currentAssembly.outputDirectionArrow) {
-    currentAssembly.outputDirectionArrow.rotation.x = outPhaseRot;
-  }
-
-  // Phase 11: Soft pulsing shaft guidance for beginner levels (1-5)
-  if (puzzleState.currentLevel <= 5) {
-    const pulse = 0.45 + 0.35 * Math.sin(now * 0.006);
-    if (currentAssembly.inputSlotMarker && !puzzleState.selectedInputTeeth && currentAssembly.inputSlotMarker.material) {
-      currentAssembly.inputSlotMarker.material.opacity = pulse;
-    }
-    if (currentAssembly.outputSlotMarker && !puzzleState.selectedOutputTeeth && currentAssembly.outputSlotMarker.material) {
-      currentAssembly.outputSlotMarker.material.opacity = pulse;
-    }
   }
 
   // Smooth OrbitControls damping
@@ -6639,18 +5971,6 @@ window.gearFactory = {
   openSettingsModal,
   closeSettingsModal,
   audio,
-  // Phase 11 API Surface
-  getContextualHint,
-  updateContextualHintUI,
-  openRpmInfoModal,
-  closeRpmInfoModal,
-  openWelcomeModal,
-  closeWelcomeModal,
-  checkFirstTimeWelcome,
-  openHowGearsModal,
-  closeHowGearsModal,
-  get inputDirectionArrow() { return currentAssembly.inputDirectionArrow; },
-  get outputDirectionArrow() { return currentAssembly.outputDirectionArrow; },
 };
 window.GearFactory = window.gearFactory;
 // --- End: src/main.js ---

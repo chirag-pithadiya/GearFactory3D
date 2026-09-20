@@ -21,9 +21,9 @@ export function createMotor(options = {}) {
   const {
     radius = 1.15,
     length = 2.4,
-    bodyColor = 0x1b3552, // Deep industrial machine blue
-    endCoverColor = 0x122338,
-    flangeColor = 0x223e60,
+    bodyColor = 0x223042, // Industrial machine slate teal-gray
+    endCoverColor = 0x182230,
+    flangeColor = 0x2c3848,
     shaftRadius = 0.28,
     shaftLength = 1.0,
     metalness = 0.74,
