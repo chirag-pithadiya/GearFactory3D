@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gear Factory 3D — Industrial Kinetic Simulator</title>
+  <meta name="description"
+    content="A browser-based 3D game and mechanical simulator featuring procedural gears, tactile factory physics, and kinetic automation.">
+  <meta name="theme-color" content="#12161f">
+
+  <!-- Google Fonts: Inter & Outfit for modern industrial typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+
+<body>
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-group">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>Gear Factory 3D</h1>
+          <p class="subtitle">BUILD • CONNECT • RUN</p>
+        </div>
+      </div>
+
+      <div class="header-level-nav" id="header-level-nav">
+        <button type="button" class="btn-header-level-nav" id="btn-header-prev-level" title="Previous Level" disabled>◀</button>
+        <span class="header-level-text" id="header-level-text">LEVEL 1</span>
+        <button type="button" class="btn-header-level-nav" id="btn-header-next-level" title="Next Level" disabled>▶</button>
+      </div>
+
+      <div class="header-nav-actions">
+        <button type="button" class="btn-header-nav btn-header-play" id="btn-header-play"
+          title="Play next available level">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          <span class="nav-btn-text">PLAY</span>
+        </button>
+        <button type="button" class="btn-header-nav" id="btn-header-level-select" title="Open Level Select menu">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+          <span class="nav-btn-text">LEVELS</span>
+        </button>
+        <button type="button" class="btn-header-nav" id="btn-header-tutorial" title="How Gears Work & Tutorial Guide">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <span class="nav-btn-text">HOW GEARS WORK</span>
+        </button>
+        <button type="button" class="btn-header-nav" id="btn-header-pause" title="Pause simulation">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16" />
+            <rect x="14" y="4" width="4" height="16" />
+          </svg>
+          <span class="nav-btn-text">PAUSE</span>
+        </button>
+        <button type="button" class="btn-header-nav" id="btn-header-menu" title="Open Main Menu">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+          <span class="nav-btn-text">MENU</span>
+        </button>
+      </div>
+
+      <div class="status-badge" id="system-status">
+        <span class="status-dot"></span>
+        <span class="status-label">READY</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Game Layout Container (3D Play-Area Left, Compact Controls Right on Desktop; No Page Scrolling) -->
+  <div class="game-layout">
+    <!-- Dedicated 3D Play-Area Section -->
+    <section id="play-area" class="play-area-section">
+      <!-- Tutorial In-Game Step Dock (Outside canvas) -->
+      <div class="tutorial-dock" id="tutorial-dock" style="display: none;"></div>
+
+      <div id="three-container" class="three-viewport-box">
+        <canvas id="webgl-canvas"></canvas>
+      </div>
+
+      <!-- Dedicated Viewport Hint & Camera Toolbar Bar -->
+      <div class="viewport-toolbar">
+        <div class="footer-hint">
+          <div class="hint-item"><span class="hint-badge">Left Drag</span> Orbit</div>
+          <div class="hint-divider">•</div>
+          <div class="hint-item"><span class="hint-badge">Right Drag</span> Pan</div>
+          <div class="hint-divider">•</div>
+          <div class="hint-item"><span class="hint-badge">Scroll</span> Zoom</div>
+        </div>
+
+        <div class="viewport-buttons-group">
+          <button id="btn-toggle-labels" class="btn-mini" title="Toggle 3D Component Labels">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+              <line x1="7" y1="7" x2="7.01" y2="7" />
+            </svg>
+            <span id="label-toggle-text">Labels: OFF</span>
+          </button>
+          <button id="btn-camera-reset" class="btn-mini" title="Reset 3D camera view">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            <span>Reset View</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dedicated Compact Control Panel (One-Screen No-Scroll Interface) -->
+    <aside id="control-panel" class="control-panel-sidebar">
+      
+      <!-- 1. LEVEL & OBJECTIVE (Compact Card) -->
+      <div class="panel-card-block level-info-block" id="puzzle-panel">
+        <div class="puzzle-header">
+          <div class="level-badge-group">
+            <span class="level-pill" id="puzzle-level-indicator">Level 1 / 50</span>
+            <span class="timer-pill" id="level-timer-display">TIME 00:00</span>
+          </div>
+          <div class="puzzle-status-badge status-pending" id="puzzle-game-status">
+            <span class="status-indicator-dot"></span>
+            <span id="puzzle-status-text">AWAITING CHECK</span>
+          </div>
+        </div>
+
+        <div class="level-mission-banner" id="level-mission-banner">
+          <div class="mission-hint-badge" id="mission-visual-hint">MOTOR ↓ ⚙️</div>
+          <div class="mission-text" id="mission-objective-text">Place a gear on the motor shaft, then connect a machine gear to start the machine.</div>
+        </div>
+
+        <div class="contextual-hint-bar" id="contextual-hint-bar">
+          <span class="hint-lamp">💡</span>
+          <span class="hint-content" id="contextual-hint-text">Select a gear from the inventory below, then place it onto the motor shaft.</span>
+        </div>
+      </div>
+
+      <!-- 2. TARGET SPEED (Compact Strip) -->
+      <div class="panel-card-block target-speed-block" id="target-speed-panel">
+        <div class="target-speed-strip">
+          <div class="speed-tile motor-tile">
+            <span class="speed-tile-label">MOTOR SPEED</span>
+            <div class="speed-tile-val">
+              <span id="puzzle-input-rpm">1000</span> <span class="unit">RPM</span>
+            </div>
+          </div>
+          <div class="speed-arrow-indicator">➔</div>
+          <div class="speed-tile target-tile target-box">
+            <div class="target-label-group">
+              <span class="speed-tile-label target-title objective-label">TARGET SPEED</span>
+              <button type="button" class="btn-info-icon" id="btn-rpm-info" title="What is RPM? (Revolutions Per Minute)">?</button>
+            </div>
+            <div class="speed-tile-val">
+              <span class="target-val" id="puzzle-target-output-rpm">500</span> <span class="unit">RPM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. AVAILABLE GEARS (Compact 3x2 Grid) -->
+      <section id="gear-inventory" class="panel-card-block gear-inventory-block">
+        <div class="inventory-section" id="gear-inventory-station">
+          <div class="inventory-header">
+            <div class="inventory-title-group">
+              <span class="inventory-title">AVAILABLE GEARS</span>
+              <div class="inventory-selection-badge" id="inventory-selection-badge">
+                Selected: <span id="selected-inventory-gear-name">None</span>
+              </div>
+            </div>
+            <button type="button" class="btn-clear-selection" id="btn-clear-selection" title="Clear gear selection">
+              Clear
+            </button>
+          </div>
+
+          <!-- Compact 3x2 Grid of Available Gear Chips -->
+          <div class="available-gears-grid compact-grid" id="available-gears-list">
+            <button type="button" class="available-gear-card gear-chip" data-teeth="10" id="inv-card-10" title="Select 10T Gear">
+              <span class="gear-card-icon">⚙</span>
+              <span class="card-teeth gear-card-name">10T</span>
+              <span class="card-dia gear-card-spec">Ø 10</span>
+              <span class="card-status inv-status">READY</span>
+            </button>
+            <button type="button" class="available-gear-card gear-chip" data-teeth="20" id="inv-card-20" title="Select 20T Gear">
+              <span class="gear-card-icon">⚙</span>
+              <span class="card-teeth gear-card-name">20T</span>
+              <span class="card-dia gear-card-spec">Ø 20</span>
+              <span class="card-status inv-status">READY</span>
+            </button>
+            <button type="button" class="available-gear-card gear-chip" data-teeth="30" id="inv-card-30" title="Select 30T Gear">
+              <span class="gear-card-icon">⚙</span>
+              <span class="card-teeth gear-card-name">30T</span>
+              <span class="card-dia gear-card-spec">Ø 30</span>
+              <span class="card-status inv-status">READY</span>
+            </button>
+            <button type="button" class="available-gear-card gear-chip" data-teeth="40" id="inv-card-40" title="Select 40T Gear">
+              <span class="gear-card-icon">⚙</span>
+              <span class="card-teeth gear-card-name">40T</span>
+              <span class="card-dia gear-card-spec">Ø 40</span>
+              <span class="card-status inv-status">READY</span>
+            </button>
+            <button type="button" class="available-gear-card gear-chip" data-teeth="50" id="inv-card-50" title="Select 50T Gear">
+              <span class="gear-card-icon">⚙</span>
+              <span class="card-teeth gear-card-name">50T</span>
+              <span class="card-dia gear-card-spec">Ø 50</span>
+              <span class="card-status inv-status">READY</span>
+            </button>
+            <button type="button" class="available-gear-card gear-chip" data-teeth="60" id="inv-card-60" title="Select 60T Gear">
+              <span class="gear-card-icon">⚙</span>
+              <span class="card-teeth gear-card-name">60T</span>
+              <span class="card-dia gear-card-spec">Ø 60</span>
+              <span class="card-status inv-status">READY</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. MOTOR GEAR / MACHINE GEAR (Side-by-Side Compact Cards) -->
+      <div class="shaft-slots-container side-by-side-slots" id="shaft-slots-container">
+        <!-- MOTOR SHAFT SLOT -->
+        <div class="shaft-slot-card input-shaft-slot compact-slot" id="input-shaft-slot">
+          <div class="slot-header-row">
+            <div class="slot-identity">
+              <span class="slot-indicator-dot dot-input"></span>
+              <span class="slot-title">INPUT GEAR</span>
+              <span class="slot-dir-badge dir-cw" id="slot-input-dir-badge" title="Clockwise rotation">↻ CW</span>
+            </div>
+            <button type="button" class="btn-slot-clear" id="btn-clear-input" title="Remove gear from Motor Shaft" style="display: none;">✕</button>
+          </div>
+          <div class="slot-display-row">
+            <span class="selected-badge input-badge slot-mounted-badge" id="selected-input-gear-display">NONE</span>
+            <button type="button" class="btn-slot-place btn-place-input" id="btn-place-input" title="Place selected gear on Motor Shaft">
+              <span class="slot-btn-text" id="btn-place-input-text">PLACE</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MACHINE SHAFT SLOT -->
+        <div class="shaft-slot-card output-shaft-slot compact-slot" id="output-shaft-slot">
+          <div class="slot-header-row">
+            <div class="slot-identity">
+              <span class="slot-indicator-dot dot-output"></span>
+              <span class="slot-title">OUTPUT GEAR</span>
+              <span class="slot-dir-badge dir-ccw" id="slot-output-dir-badge" title="Counter-Clockwise rotation">↺ CCW</span>
+            </div>
+            <button type="button" class="btn-slot-clear" id="btn-clear-output" title="Remove gear from Machine Shaft" style="display: none;">✕</button>
+          </div>
+          <div class="slot-display-row">
+            <span class="selected-badge output-badge slot-mounted-badge" id="selected-output-gear-display">NONE</span>
+            <button type="button" class="btn-slot-place btn-place-output" id="btn-place-output" title="Place selected gear on Machine Shaft">
+              <span class="slot-btn-text" id="btn-place-output-text">PLACE</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. SOLUTION STATUS (Compact Verification) -->
+      <div class="panel-card-block verification-results-card compact-verification" id="verification-card">
+        <div class="verification-compact-grid">
+          <div class="verif-compact-item">
+            <span class="verif-label">TARGET</span>
+            <span class="verif-val target-val" id="puzzle-result-target-rpm">500.0 RPM</span>
+          </div>
+          <div class="verif-compact-item highlight-rpm">
+            <span class="verif-label">OUTPUT</span>
+            <span class="verif-val" id="puzzle-calculated-output-rpm">---</span>
+          </div>
+          <div class="verif-compact-item">
+            <span class="verif-label">STATUS</span>
+            <span class="verification-status-pill status-pending" id="verification-status-pill">WAITING</span>
+          </div>
+        </div>
+
+        <!-- Hidden container preserving legacy test element IDs -->
+        <div style="display: none;" aria-hidden="true">
+          <span id="result-input-gear">20 T</span>
+          <span id="result-output-gear">30 T</span>
+          <span id="puzzle-status-val">Press Check Solution</span>
+          <div id="realtime-rpm-panel">
+            <span id="telemetry-motor-rpm">990 RPM</span>
+            <span id="telemetry-input-rpm">0 RPM</span>
+            <div id="tile-output-rpm"><span id="telemetry-output-rpm">---</span></div>
+          </div>
+          <button id="btn-start"></button>
+          <button id="btn-stop"></button>
+          <button id="btn-reset"></button>
+        </div>
+
+        <!-- Feedback Banners -->
+        <div class="puzzle-banner puzzle-success-banner" id="puzzle-success-banner" style="display: none;">
+          <div class="banner-icon success-icon">✓</div>
+          <div class="banner-content">
+            <strong class="banner-title success-title">GEARS CONNECTED!</strong>
+            <span class="banner-desc" id="success-banner-desc">Machine running at target speed.</span>
+          </div>
+        </div>
+
+        <div class="puzzle-banner puzzle-fail-banner" id="puzzle-fail-banner" style="display: none;">
+          <div class="banner-icon fail-icon">!</div>
+          <div class="banner-content">
+            <strong class="banner-title fail-title">NOT QUITE</strong>
+            <span class="banner-desc" id="fail-banner-desc">Speed does not match target.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. FIXED ACTION BAR (Always visible at bottom without scrolling) -->
+      <div class="fixed-action-bar" id="fixed-action-bar">
+        <button type="button" class="btn-action btn-action-tutorial" id="btn-how-it-works-action" title="How Gears Work Visual Guide">
+          <span>HOW IT WORKS</span>
+        </button>
+        <button type="button" class="btn-action btn-action-reset" id="btn-reset-level" title="Reset gear selections for this level">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+          <span>RESET</span>
+        </button>
+        <button type="button" class="btn-action btn-action-check" id="btn-check-solution" title="Check machine speed and solution">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span>CHECK SOLUTION</span>
+        </button>
+      </div>
+
+      <!-- Level Prev/Next navigation buttons -->
+      <div class="level-nav-row" id="level-nav-row">
+        <button id="btn-prev-level" class="btn-puzzle btn-prev" disabled title="Go to previous level">
+          ◀ Prev Level
+        </button>
+        <button id="btn-next-level" class="btn-puzzle btn-next" disabled title="Advance to next level">
+          Next Level ▶
+        </button>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- Hidden Fallback Container for Backwards Compatibility -->
+  <div style="display: none;" aria-hidden="true">
+    <input type="number" id="input-rpm-field" value="100">
+    <input type="number" id="input-teeth-field" value="20">
+    <input type="number" id="output-teeth-field" value="20">
+    <span id="rpm-value">0.0</span>
+    <span id="stat-teeth">20 T</span>
+    <span id="input-rpm-val">0.0</span>
+    <span id="output-rpm-val">0.0</span>
+    <div id="input-meter-fill"></div>
+    <div id="output-meter-fill"></div>
+    <span id="stat-input-teeth">20 T</span>
+    <span id="stat-output-teeth">20 T</span>
+    <span id="stat-input-rpm-display">100.0</span>
+    <span id="stat-output-rpm-display">---</span>
+    <span id="stat-gear-ratio">---</span>
+    <span id="gear-ratio-tag">GEARBOX</span>
+    <span id="validation-status">STATUS: OK</span>
+    <span id="puzzle-level-pill">Level 1</span>
+    <span id="puzzle-level-title">Level 1</span>
+    <span id="puzzle-level-number">1 / 5</span>
+    <span id="puzzle-input-teeth">20 T</span>
+    <span id="puzzle-output-teeth">20 T</span>
+    <span id="puzzle-current-output-rpm">---</span>
+    <span id="puzzle-current-ratio">---</span>
+    <span id="puzzle-ratio-target">Target</span>
+  </div>
+
+  <!-- ==========================================================================
+       Level Select Screen Overlay (Modal)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="level-select-modal" style="display: none;">
+    <div class="level-select-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-eyebrow">GEAR FACTORY 3D</span>
+          <h2 class="modal-title">LEVEL SELECT</h2>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-level-select" title="Close Level Select">✕</button>
+      </div>
+
+      <div class="level-select-scroll-area">
+        <div id="level-select-grid" class="level-tiers-wrapper">
+          <!-- Populated dynamically by ui.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Menu Modal (Phase 7) -->
+  <div class="modal-backdrop" id="main-menu-modal" style="display: none;">
+    <div class="menu-card industrial-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-eyebrow">BUILD • CONNECT • RUN</span>
+          <h2 class="modal-title">GEAR FACTORY 3D</h2>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-main-menu" title="Close Menu">✕</button>
+      </div>
+      <div class="menu-actions-stack">
+        <button type="button" class="btn-menu-action btn-menu-play" id="btn-menu-play">
+          <span class="menu-action-icon">▶</span>
+          <span class="menu-action-label">PLAY</span>
+        </button>
+        <button type="button" class="btn-menu-action" id="btn-menu-level-select">
+          <span class="menu-action-icon">⊞</span>
+          <span class="menu-action-label">LEVEL SELECT</span>
+        </button>
+        <button type="button" class="btn-menu-action" id="btn-menu-tutorial">
+          <span class="menu-action-icon">⚙</span>
+          <span class="menu-action-label">HOW GEARS WORK</span>
+        </button>
+        <button type="button" class="btn-menu-action" id="btn-menu-settings">
+          <span class="menu-action-icon">🛠</span>
+          <span class="menu-action-label">SETTINGS</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutorial Modal (Intro & Completion) -->
+  <div class="modal-backdrop" id="tutorial-modal" style="display: none;"></div>
+
+  <!-- First-Time Player Welcome Modal (Phase 11) -->
+  <div class="modal-backdrop" id="welcome-modal" style="display: none;">
+    <div class="welcome-card industrial-dialog">
+      <div class="modal-eyebrow">OLD FACTORY WORKSHOP</div>
+      <h2 class="modal-title">WELCOME TO THE FACTORY</h2>
+      <p class="welcome-quote">"Looks mechanical. Plays simple."</p>
+      <div class="welcome-rules-box">
+        <div class="welcome-rule-item">
+          <span class="rule-bullet">1</span>
+          <span><strong>Your job is simple:</strong> Connect the gears and make the machine run.</span>
+        </div>
+        <div class="welcome-rule-item">
+          <span class="rule-bullet">2</span>
+          <span><strong>The motor powers the first gear:</strong> It turns the entire machine.</span>
+        </div>
+        <div class="welcome-rule-item">
+          <span class="rule-bullet">3</span>
+          <span><strong>Different gear sizes change speed:</strong> Big gears turn slower, small gears turn faster.</span>
+        </div>
+      </div>
+      <div class="intro-action-row">
+        <button type="button" class="btn-primary" id="btn-welcome-start">LET'S TRY THE FIRST MACHINE ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RPM Explanation Modal (Phase 11) -->
+  <div class="modal-backdrop" id="rpm-info-modal" style="display: none;">
+    <div class="rpm-info-card industrial-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-eyebrow">MECHANICAL BASICS</span>
+          <h2 class="modal-title">WHAT IS RPM?</h2>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-rpm-info" title="Close">✕</button>
+      </div>
+      <div class="rpm-info-body">
+        <p class="rpm-main-def"><strong>RPM</strong> means <strong>how many times the gear turns in one minute</strong> (Revolutions Per Minute).</p>
+        <div class="rpm-rules-list">
+          <div class="rpm-rule-item">
+            <span class="rpm-rule-icon">⚙</span>
+            <div>
+              <strong>Small Gears = Spin Faster</strong>
+              <p>Fewer teeth require less time per turn, producing higher speed.</p>
+            </div>
+          </div>
+          <div class="rpm-rule-item">
+            <span class="rpm-rule-icon">⚙</span>
+            <div>
+              <strong>Big Gears = Spin Slower</strong>
+              <p>More teeth take more time per turn, producing lower speed.</p>
+            </div>
+          </div>
+          <div class="rpm-rule-item">
+            <span class="rpm-rule-icon">🔄</span>
+            <div>
+              <strong>Touching Gears Turn Opposite</strong>
+              <p>When two gears mesh, one turns clockwise (↻) and the other turns counter-clockwise (↺).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="intro-action-row">
+        <button type="button" class="btn-primary" id="btn-got-rpm-info">UNDERSTOOD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- How Gears Work 4-Page Visual Guide Modal (Phase 11) -->
+  <div class="modal-backdrop" id="how-gears-work-modal" style="display: none;">
+    <div class="how-gears-card industrial-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-eyebrow">MECHANICAL PRIMER</span>
+          <h2 class="modal-title" id="how-gears-guide-title">HOW GEARS WORK</h2>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-how-gears" title="Close Guide">✕</button>
+      </div>
+      <div class="how-gears-page-wrapper" id="how-gears-body">
+        <!-- Injected dynamically by ui.js -->
+      </div>
+      <div class="how-gears-footer-row">
+        <button type="button" class="btn-secondary" id="btn-how-gears-prev">PREV</button>
+        <div class="how-gears-indicators" id="how-gears-dots">
+          <span class="h-dot active"></span>
+          <span class="h-dot"></span>
+          <span class="h-dot"></span>
+          <span class="h-dot"></span>
+        </div>
+        <button type="button" class="btn-primary" id="btn-how-gears-next">NEXT ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level Introduction Overlay (Phase 7 & 11) -->
+  <div class="modal-backdrop" id="level-intro-modal" style="display: none;">
+    <div class="level-intro-card industrial-dialog">
+      <div class="modal-eyebrow" id="intro-tier-badge">BEGINNER</div>
+      <h2 class="modal-title" id="intro-level-title">LEVEL 1</h2>
+      <div class="intro-visual-hint" id="intro-visual-hint">MOTOR ↓ ⚙️</div>
+      <p class="intro-teach-msg" id="intro-teach-msg">Let's start the machine.</p>
+      <div class="intro-specs-box">
+        <span class="spec-label">TARGET MACHINE SPEED</span>
+        <span class="spec-value" id="intro-target-rpm">500 RPM</span>
+      </div>
+      <div class="intro-action-row">
+        <button type="button" class="btn-primary" id="btn-start-level">START LEVEL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level Complete Screen Modal (Phase 7 & 11) -->
+  <div class="modal-backdrop" id="level-complete-modal" style="display: none;">
+    <div class="level-complete-card industrial-dialog">
+      <div class="tut-complete-icon">✓</div>
+      <div class="modal-eyebrow">MISSION ACCOMPLISHED</div>
+      <h2 class="modal-title">LEVEL COMPLETE</h2>
+      <div class="complete-stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">MACHINE SPEED</span>
+          <span class="stat-value" id="modal-output-rpm">500 RPM</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">TIME</span>
+          <span class="stat-value" id="modal-elapsed-time">00:24</span>
+        </div>
+      </div>
+      <div class="complete-actions-stack">
+        <button type="button" class="btn-primary" id="btn-modal-next-level">NEXT LEVEL</button>
+        <button type="button" class="btn-secondary" id="btn-modal-level-select">LEVEL SELECT</button>
+        <button type="button" class="btn-secondary" id="btn-modal-replay">REPLAY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause Screen Modal (Phase 7) -->
+  <div class="modal-backdrop" id="pause-modal" style="display: none;">
+    <div class="pause-card industrial-dialog">
+      <div class="modal-eyebrow">SIMULATION PAUSED</div>
+      <h2 class="modal-title">PAUSED</h2>
+      <div class="menu-actions-stack">
+        <button type="button" class="btn-menu-action btn-menu-play" id="btn-pause-resume">RESUME</button>
+        <button type="button" class="btn-menu-action" id="btn-pause-reset">RESET LEVEL</button>
+        <button type="button" class="btn-menu-action" id="btn-pause-level-select">LEVEL SELECT</button>
+        <button type="button" class="btn-menu-action" id="btn-pause-main-menu">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal (Phase 7) -->
+  <div class="modal-backdrop" id="settings-modal" style="display: none;">
+    <div class="settings-card industrial-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-eyebrow">CONFIGURATION</span>
+          <h2 class="modal-title">SETTINGS</h2>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-settings" title="Close Settings">✕</button>
+      </div>
+      <div class="settings-controls-list">
+        <div class="setting-row">
+          <span class="setting-label">SOUND EFFECTS</span>
+          <button type="button" class="btn-setting-toggle active" id="btn-toggle-sound">ON</button>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">MACHINE HUM / MUSIC</span>
+          <button type="button" class="btn-setting-toggle active" id="btn-toggle-music">ON</button>
+        </div>
+      </div>
+      <div class="settings-action-row">
+        <button type="button" class="btn-secondary" id="btn-back-settings">BACK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core Three.js Engine & Controls (Offline Standalone UMD, zero CORS issues) -->
+  <script src="./vendor/three.min.js"></script>
+  <script src="./vendor/OrbitControls.js"></script>
+
+  <!-- Unified Production Bundle (Works directly via file:/// and http://) -->
+  <script src="./dist/bundle.js"></script>
+</body>
+
+</html>
