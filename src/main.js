@@ -98,6 +98,19 @@ import {
   openWelcomeModal,
   closeWelcomeModal,
   checkFirstTimeWelcome,
+  updatePointsUI,
+  openGearInventoryModal,
+  closeGearInventoryModal,
+  openLockedGearModal,
+  closeLockedGearModal,
+  showUnlockToast,
+  showUnlockToastsSequentially,
+  openProgressModal,
+  closeProgressModal,
+  renderProgressModal,
+  openUnlockCelebrationModal,
+  closeUnlockCelebrationModal,
+  queueUnlockCelebrations,
 } from './ui.js';
 import {
   initDragDrop,
@@ -108,7 +121,26 @@ import {
   returnGearToInventory,
   updateDropTargetPositions,
   dragDropState,
+  bindCardDragListeners,
 } from './drag-drop.js';
+import {
+  getPlayerPoints,
+  addPlayerPoints,
+  getUnlockedGears,
+  isGearUnlocked,
+  getNextLockedGear,
+  calculateLevelReward,
+  commitLevelReward,
+  validateLevelGearRequirement,
+  checkAndUnlockGears,
+  migrateExistingProgress,
+  resetAllProgress,
+  getLevelStats,
+  getAllBadgesEarned,
+  getRecentRewards,
+  getProgressionSummary,
+  getCompletedLevelsCount,
+} from './points.js';
 import {
   startTutorial,
   skipTutorial,
@@ -379,6 +411,7 @@ function openLevelSelect() {
 
 function loadLevel(levelNumber, skipIntro = false) {
   clearDragState();
+  closeLevelComplete();
   if (!isLevelUnlocked(levelNumber)) {
     levelNumber = getNextIncompleteLevel();
   }
@@ -404,8 +437,21 @@ function loadLevel(levelNumber, skipIntro = false) {
     });
   }
 
+  // Phase 15: Initialize per-level attempt and bonus tracking
+  puzzleState.failedChecksCount = 0;
+  puzzleState.hintUsedThisLevel = false;
+  puzzleState.attemptsCount = 1;
+
+  // Phase 15: Validate gear availability for this level
+  const reqCheck = validateLevelGearRequirement(level);
+  if (!reqCheck.canPlay) {
+    showFailBanner('NEW GEAR REQUIRED: Unlock the required gear to continue.');
+  }
+
   // Render level-specific available gears
-  renderAvailableGears(level.availableGears || [10, 20, 30, 40, 50, 60]);
+  renderAvailableGears(level.availableGears || GEAR_INVENTORY);
+  bindCardDragListeners();
+  updatePointsUI();
 
   // Phase 2: Start with empty placement slots (no gears pre-mounted)
   puzzleState.selectedInventoryGear = null;
@@ -470,6 +516,8 @@ function resetLevel() {
   puzzleState.hasCheckedSolution = false;
   puzzleState.lastCalculatedRPM = null;
   puzzleState.isSolutionPass = false;
+  puzzleState.attemptsCount = (puzzleState.attemptsCount || 1) + 1;
+  puzzleState.failedChecksCount = (puzzleState.failedChecksCount || 0) + 1;
 
   kinetics.inputAngle = 0;
   kinetics.outputAngle = 0;
@@ -656,6 +704,7 @@ function onSelectionChanged() {
 }
 
 function checkPuzzleSolution(isUserClick = true) {
+  const level = getLevel(puzzleState.currentLevel);
   const result = checkLevelSolution(
     puzzleState.currentLevel,
     puzzleState.selectedInputTeeth,
@@ -697,8 +746,30 @@ function checkPuzzleSolution(isUserClick = true) {
     );
     audio.playSuccess();
 
+    // Phase 15: Calculate & Commit Rewards (Anti-Farming Protected)
+    const isPerfect = (puzzleState.failedChecksCount === 0);
+    const timeSeconds = state.levelTimeSeconds;
+    const isFirstAttempt = (puzzleState.attemptsCount <= 1);
+    const hintUsed = !!puzzleState.hintUsedThisLevel;
+
+    const rewardResult = calculateLevelReward(puzzleState.currentLevel, {
+      isFirstAttempt,
+      hintUsed,
+      timeSeconds,
+      isPerfect,
+    });
+    const commitRes = commitLevelReward(puzzleState.currentLevel, rewardResult);
+    updatePointsUI(commitRes.totalPoints);
+
+    if (commitRes.newlyUnlockedGears && commitRes.newlyUnlockedGears.length > 0) {
+      showUnlockToastsSequentially(commitRes.newlyUnlockedGears);
+    }
+
+    // Refresh available gears in case a new gear was unlocked
+    renderAvailableGears(level ? (level.availableGears || GEAR_INVENTORY) : GEAR_INVENTORY);
+    bindCardDragListeners();
+
     // Phase 11: Update hint to celebrate
-    const level = getLevel(puzzleState.currentLevel);
     if (level) {
       updateContextualHintUI(getContextualHint({
         level: level.level,
@@ -726,10 +797,18 @@ function checkPuzzleSolution(isUserClick = true) {
           onLevelSelect: () => openLevelSelect(),
           onReplay: () => replayCurrentLevel(),
         },
-        isFinalLevel
+        isFinalLevel,
+        {
+          ...rewardResult,
+          ...commitRes,
+          levelId: puzzleState.currentLevel,
+        }
       );
     }
   } else {
+    // Increment failed check count for perfect solution bonus calculation
+    puzzleState.failedChecksCount = (puzzleState.failedChecksCount || 0) + 1;
+    puzzleState.attemptsCount = (puzzleState.attemptsCount || 1) + 1;
     setPuzzleStatusUI('TRY AGAIN', 'try-again');
     if (elements.btnNextLevel) {
       elements.btnNextLevel.disabled = puzzleState.currentLevel >= getTotalLevels() || !isLevelUnlocked(puzzleState.currentLevel + 1);
@@ -834,13 +913,22 @@ initUI({
   },
   onOpenLevelSelect: () => openLevelSelect(),
   onOpenTutorial: () => {
+    puzzleState.hintUsedThisLevel = true;
     audio.playButtonClick();
     closeMainMenu();
     openHowGearsModal();
   },
   onOpenRpmInfo: () => {
+    puzzleState.hintUsedThisLevel = true;
     audio.playButtonClick();
     openRpmInfoModal();
+  },
+  onResetAllProgress: () => {
+    resetAllProgress();
+    updatePointsUI(0);
+    renderAvailableGears(GEAR_INVENTORY);
+    loadLevel(1, false);
+    showSuccessBanner('ALL PROGRESS RESET: Factory simulation reinitialized.');
   },
   onWelcomeStart: () => {
     audio.playButtonClick();
@@ -944,6 +1032,11 @@ initDragDrop({
 
 // Requirement 16: Validate all levels on startup
 validateLevels();
+
+// Phase 15: Safe Progression Migration & Points Initialization
+migrateExistingProgress();
+checkAndUnlockGears();
+updatePointsUI();
 
 // Expose state globally for drag-drop and external inspection
 window.gearFactoryState = state;
@@ -1262,5 +1355,40 @@ window.gearFactory = {
   closeHowGearsModal,
   get inputDirectionArrow() { return currentAssembly.inputDirectionArrow; },
   get outputDirectionArrow() { return currentAssembly.outputDirectionArrow; },
+  // Phase 15 & 16 Points & Progression API Surface
+  get points() { return getPlayerPoints(); },
+  getPlayerPoints,
+  addPlayerPoints,
+  getUnlockedGears,
+  isGearUnlocked,
+  getNextLockedGear,
+  calculateLevelReward,
+  commitLevelReward,
+  validateLevelGearRequirement,
+  checkAndUnlockGears,
+  openGearInventoryModal,
+  closeGearInventoryModal,
+  showUnlockToast,
+  showUnlockToastsSequentially,
+  migrateExistingProgress,
+  openProgressModal,
+  closeProgressModal,
+  renderProgressModal,
+  openUnlockCelebrationModal,
+  closeUnlockCelebrationModal,
+  queueUnlockCelebrations,
+  getLevelStats,
+  getAllBadgesEarned,
+  getRecentRewards,
+  getProgressionSummary,
+  getCompletedLevelsCount,
+  resetAllProgress: () => {
+    resetAllProgress();
+    puzzleState.attemptsCount = 1;
+    puzzleState.failedChecksCount = 0;
+    puzzleState.hintUsedThisLevel = false;
+    updatePointsUI(0);
+    loadLevel(1, false);
+  },
 };
 window.GearFactory = window.gearFactory;

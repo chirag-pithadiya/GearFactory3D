@@ -269,6 +269,46 @@ class SoundEngine {
     } catch {}
   }
 
+  /**
+   * Phase 16: Mechanical gear ratchet clack + resonant workshop chime for gear unlock celebration.
+   */
+  playCelebrationUnlock() {
+    if (!this.isEnabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx) return;
+
+      const baseTime = this.ctx.currentTime;
+      // Precision mechanical gear indexing ratchet clicks
+      [0, 0.045, 0.095, 0.15].forEach((offset, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(420 + idx * 90, baseTime + offset);
+        gain.gain.setValueAtTime(0.14, baseTime + offset);
+        gain.gain.exponentialRampToValueAtTime(0.001, baseTime + offset + 0.04);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(baseTime + offset);
+        osc.stop(baseTime + offset + 0.05);
+      });
+
+      // Warm industrial brass chime
+      const oscChime = this.ctx.createOscillator();
+      const gainChime = this.ctx.createGain();
+      oscChime.type = 'sine';
+      oscChime.frequency.setValueAtTime(587.33, baseTime + 0.18); // D5
+      oscChime.frequency.setValueAtTime(880.00, baseTime + 0.30); // A5
+      gainChime.gain.setValueAtTime(0.001, baseTime + 0.18);
+      gainChime.gain.linearRampToValueAtTime(0.16, baseTime + 0.22);
+      gainChime.gain.exponentialRampToValueAtTime(0.001, baseTime + 0.75);
+      oscChime.connect(gainChime);
+      gainChime.connect(this.ctx.destination);
+      oscChime.start(baseTime + 0.18);
+      oscChime.stop(baseTime + 0.76);
+    } catch {}
+  }
+
   setEnabled(enabled) {
     this.isEnabled = !!enabled;
   }

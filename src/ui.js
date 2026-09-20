@@ -10,6 +10,20 @@
  */
 
 import { GEAR_INVENTORY } from './game-state.js';
+import {
+  getPlayerPoints,
+  getUnlockedGears,
+  isGearUnlocked,
+  getNextLockedGear,
+  GEAR_UNLOCKS,
+  BADGE_CONFIG,
+  BADGE_TYPES,
+  getLevelStats,
+  getAllBadgesEarned,
+  getProgressionSummary,
+  getCompletedLevelsCount,
+} from './points.js';
+import { audio } from './audio.js';
 
 // DOM Element References Cache
 export const elements = {
@@ -169,6 +183,67 @@ export const elements = {
   contextualHintText: document.getElementById('contextual-hint-text'),
   introVisualHint: document.getElementById('intro-visual-hint'),
   introTeachMsg: document.getElementById('intro-teach-msg'),
+
+  // Phase 15: In-Game Points & Gear Inventory Elements
+  headerPointsBadge: document.getElementById('header-points-badge'),
+  headerPointsVal: document.getElementById('header-points-val'),
+  menuPointsVal: document.getElementById('menu-points-val'),
+  btnMenuGearInventory: document.getElementById('btn-menu-gear-inventory'),
+  gearInventoryModal: document.getElementById('gear-inventory-modal'),
+  btnCloseGearInventory: document.getElementById('btn-close-gear-inventory'),
+  btnCloseInventoryAction: document.getElementById('btn-close-inventory-action'),
+  invModalTotalPoints: document.getElementById('inv-modal-total-points'),
+  invNextGearCard: document.getElementById('inv-next-gear-card'),
+  invNextGearTitle: document.getElementById('inv-next-gear-title'),
+  invNextGearFill: document.getElementById('inv-next-gear-fill'),
+  invNextGearSubtext: document.getElementById('inv-next-gear-subtext'),
+  gearInventoryFullGrid: document.getElementById('gear-inventory-full-grid'),
+  lockedGearModal: document.getElementById('locked-gear-modal'),
+  lockedGearTitle: document.getElementById('locked-gear-title'),
+  lockedGearDesc: document.getElementById('locked-gear-desc'),
+  lockedCurrentPoints: document.getElementById('locked-current-points'),
+  lockedRemainingPoints: document.getElementById('locked-remaining-points'),
+  btnCloseLockedGear: document.getElementById('btn-close-locked-gear'),
+  unlockNotificationToast: document.getElementById('unlock-notification-toast'),
+  unlockToastTitle: document.getElementById('unlock-toast-title'),
+  modalRewardsSection: document.getElementById('modal-rewards-section'),
+  modalRewardsBreakdown: document.getElementById('modal-rewards-breakdown'),
+  modalTotalEarned: document.getElementById('modal-total-earned'),
+  modalCurrentPoints: document.getElementById('modal-current-points'),
+  btnResetAllProgress: document.getElementById('btn-reset-all-progress'),
+
+  // Phase 16: Player Progression & Celebration Elements
+  btnHeaderProgress: document.getElementById('btn-header-progress'),
+  btnMenuProgress: document.getElementById('btn-menu-progress'),
+  progressModal: document.getElementById('progress-modal'),
+  btnCloseProgress: document.getElementById('btn-close-progress'),
+  btnProgressBack: document.getElementById('btn-progress-back'),
+  progTotalPoints: document.getElementById('prog-total-points'),
+  progGearsUnlocked: document.getElementById('prog-gears-unlocked'),
+  progLevelsCompleted: document.getElementById('prog-levels-completed'),
+  progBadgesEarned: document.getElementById('prog-badges-earned'),
+  progNextGearPanel: document.getElementById('prog-next-gear-panel'),
+  progNextGearName: document.getElementById('prog-next-gear-name'),
+  progNextGearTarget: document.getElementById('prog-next-gear-target'),
+  progPointsRatio: document.getElementById('prog-points-ratio'),
+  progPointsPct: document.getElementById('prog-points-pct'),
+  progBarFill: document.getElementById('prog-bar-fill'),
+  progPointsRemaining: document.getElementById('prog-points-remaining'),
+  progRecentRewardsList: document.getElementById('prog-recent-rewards-list'),
+  gearCelebrationModal: document.getElementById('gear-celebration-modal'),
+  celebrationGearTitle: document.getElementById('celebration-gear-title'),
+  btnCelebrationContinue: document.getElementById('btn-celebration-continue'),
+  modalLevelChip: document.getElementById('modal-level-chip'),
+  modalBestTimeItem: document.getElementById('modal-best-time-item'),
+  modalBestTimeLabel: document.getElementById('modal-best-time-label'),
+  modalBestTimeVal: document.getElementById('modal-best-time-val'),
+  modalBadgesSection: document.getElementById('modal-badges-section'),
+  modalBadgesList: document.getElementById('modal-badges-list'),
+  modalCampaignMastery: document.getElementById('modal-campaign-mastery'),
+  masteryTotalPoints: document.getElementById('mastery-total-points'),
+  masteryGearsUnlocked: document.getElementById('mastery-gears-unlocked'),
+  masteryBadgesEarned: document.getElementById('mastery-badges-earned'),
+  masteryBestPerformance: document.getElementById('mastery-best-performance'),
 };
 
 /**
@@ -352,6 +427,42 @@ export function initUI(handlers = {}) {
     if (e.target === elements.howGearsWorkModal) closeHowGearsModal();
   });
 
+  // Phase 15: In-Game Points & Gear Inventory Listeners
+  elements.headerPointsBadge?.addEventListener('click', () => openProgressModal());
+  elements.btnMenuGearInventory?.addEventListener('click', () => openGearInventoryModal());
+  elements.btnCloseGearInventory?.addEventListener('click', () => closeGearInventoryModal());
+  elements.btnCloseInventoryAction?.addEventListener('click', () => closeGearInventoryModal());
+  elements.gearInventoryModal?.addEventListener('click', (e) => {
+    if (e.target === elements.gearInventoryModal) closeGearInventoryModal();
+  });
+  elements.btnCloseLockedGear?.addEventListener('click', () => closeLockedGearModal());
+  elements.lockedGearModal?.addEventListener('click', (e) => {
+    if (e.target === elements.lockedGearModal) closeLockedGearModal();
+  });
+  elements.btnResetAllProgress?.addEventListener('click', () => {
+    const confirmed = window.confirm('ARE YOU SURE?\n\nThis will permanently reset all player points, unlocked gears, and level progress.\n\nThis action cannot be undone.');
+    if (confirmed) {
+      if (handlers.onResetAllProgress) handlers.onResetAllProgress();
+    }
+  });
+
+  // Phase 16: Player Progress & Celebration Modal Listeners
+  elements.btnHeaderProgress?.addEventListener('click', () => openProgressModal());
+  elements.btnMenuProgress?.addEventListener('click', () => {
+    closeMainMenu();
+    openProgressModal();
+  });
+  elements.btnCloseProgress?.addEventListener('click', () => closeProgressModal());
+  elements.btnProgressBack?.addEventListener('click', () => closeProgressModal());
+  elements.progressModal?.addEventListener('click', (e) => {
+    if (e.target === elements.progressModal) closeProgressModal();
+  });
+
+  elements.btnCelebrationContinue?.addEventListener('click', () => closeUnlockCelebrationModal());
+  elements.gearCelebrationModal?.addEventListener('click', (e) => {
+    if (e.target === elements.gearCelebrationModal) closeUnlockCelebrationModal();
+  });
+
   // Available Gear Inventory Binding
   createGearInventory(onSelectGear, onSelectInputGear, onSelectOutputGear);
 }
@@ -360,10 +471,14 @@ export function initUI(handlers = {}) {
  * Creates or attaches listeners to gear inventory cards.
  */
 export function createGearInventory(onSelectGear, onSelectInput, onSelectOutput) {
-  // Available Gears list (Phase 2 primary inventory)
+  // Available Gears list (Phase 2 & 15 primary inventory)
   document.querySelectorAll('.available-gear-card').forEach((card) => {
     card.addEventListener('click', () => {
       const teeth = parseInt(card.getAttribute('data-teeth'), 10);
+      if (!isGearUnlocked(teeth)) {
+        openLockedGearModal(teeth);
+        return;
+      }
       if (onSelectGear) {
         onSelectGear(teeth);
       } else if (onSelectInput) {
@@ -655,7 +770,7 @@ export function updateRealtimeRPMUI(motorRPM, inputRPM, outputRPM, isEngaged = f
 }
 
 /**
- * Phase 4: Dynamic Available Gears Filtering
+ * Phase 4 & 15: Dynamic Available Gears Filtering & Unlock State Styling
  */
 export function renderAvailableGears(availableGears = [10, 20, 30, 40, 50, 60]) {
   const cards = document.querySelectorAll('.available-gear-card');
@@ -663,6 +778,30 @@ export function renderAvailableGears(availableGears = [10, 20, 30, 40, 50, 60]) 
     const t = parseInt(card.getAttribute('data-teeth'), 10);
     if (availableGears.includes(t)) {
       card.style.display = 'flex';
+      const unlocked = isGearUnlocked(t);
+      const statusEl = card.querySelector('.card-status');
+      const iconEl = card.querySelector('.gear-card-icon');
+      const specEl = card.querySelector('.gear-card-spec');
+      const unlockCfg = GEAR_UNLOCKS.find(g => g.teeth === t);
+
+      if (unlocked) {
+        card.classList.remove('locked');
+        if (iconEl) iconEl.textContent = '⚙';
+        if (specEl) specEl.textContent = `Ø ${t}`;
+        card.title = `Select ${t}T Gear`;
+        if (statusEl && statusEl.textContent === 'LOCKED') {
+          statusEl.textContent = 'READY';
+        }
+      } else {
+        card.classList.add('locked');
+        if (iconEl) iconEl.textContent = '🔒';
+        const ptsReq = unlockCfg ? unlockCfg.pointsRequired.toLocaleString() : '---';
+        if (specEl) specEl.textContent = `${ptsReq} PTS`;
+        card.title = `${t}T Gear (Locked — Unlocks automatically at ${ptsReq} PTS)`;
+        if (statusEl && !['SELECTED', 'IN INPUT', 'IN OUTPUT', 'IN BOTH'].includes(statusEl.textContent)) {
+          statusEl.textContent = 'LOCKED';
+        }
+      }
     } else {
       card.style.display = 'none';
     }
@@ -778,12 +917,28 @@ export function renderLevelSelectModal(levels, completedList = [], highestUnlock
       btn.disabled = !isUnlocked;
       btn.title = isUnlocked ? `Play Level ${lNum}` : `Level ${lNum} Locked`;
 
-      let statusText = isCompleted ? '✓ Done' : (isUnlocked ? 'Play' : '🔒');
+      let statusHtml = '';
+      if (isCompleted) {
+        const stats = getLevelStats(lNum);
+        let badgeHtml = '';
+        if (stats.badges && stats.badges.includes('PERFECT')) {
+          badgeHtml = '<span class="level-tile-badge">★ PERFECT</span>';
+        } else if (stats.badges && stats.badges.length > 0) {
+          const icons = stats.badges.map(b => BADGE_CONFIG[b]?.icon || '★').join('');
+          badgeHtml = `<span class="level-tile-badge">${icons}</span>`;
+        }
+        statusHtml = `<span class="level-tile-status status-complete">✓ COMPLETE</span>${badgeHtml}`;
+      } else if (isUnlocked) {
+        statusHtml = '<span class="level-tile-status">Play</span>';
+      } else {
+        statusHtml = '<span class="level-tile-status">🔒</span>';
+      }
+
       const formattedNum = lNum < 10 ? `0${lNum}` : `${lNum}`;
 
       btn.innerHTML = `
         <span class="level-tile-num">${formattedNum}</span>
-        <span class="level-tile-status">${statusText}</span>
+        ${statusHtml}
       `;
 
       if (isUnlocked) {
@@ -877,7 +1032,7 @@ export function closeLevelIntro() {
   if (elements.levelIntroModal) elements.levelIntroModal.style.display = 'none';
 }
 
-export function showLevelComplete(targetRPM, outputRPM, timeStr, callbacks = {}, isFinalLevel = false) {
+export function showLevelComplete(targetRPM, outputRPM, timeStr, callbacks = {}, isFinalLevel = false, rewardsData = null) {
   if (!elements.levelCompleteModal) return;
   if (elements.modalOutputRpm) {
     elements.modalOutputRpm.textContent = `${Math.round(outputRPM)} RPM`;
@@ -889,13 +1044,135 @@ export function showLevelComplete(targetRPM, outputRPM, timeStr, callbacks = {},
   const modalTitle = elements.levelCompleteModal.querySelector('.modal-title');
   const modalEyebrow = elements.levelCompleteModal.querySelector('.modal-eyebrow');
   if (modalTitle) {
-    modalTitle.textContent = isFinalLevel ? 'ALL LEVELS COMPLETE' : 'LEVEL COMPLETE';
+    modalTitle.textContent = isFinalLevel ? 'ALL LEVELS COMPLETE!' : 'LEVEL COMPLETE!';
   }
   if (modalEyebrow) {
-    modalEyebrow.textContent = isFinalLevel ? 'CAMPAIGN COMPLETED' : 'MISSION ACCOMPLISHED';
+    modalEyebrow.textContent = isFinalLevel ? 'CONGRATULATIONS!' : 'MISSION ACCOMPLISHED';
+  }
+
+  // Phase 16: Level Number Indicator
+  if (elements.modalLevelChip) {
+    elements.modalLevelChip.textContent = `LEVEL ${rewardsData?.levelId || 1}`;
+  }
+
+  // Phase 16: Best Time Comparison
+  if (elements.modalBestTimeItem && elements.modalBestTimeVal) {
+    if (rewardsData && typeof rewardsData.currentBestTime === 'number' && rewardsData.currentBestTime > 0) {
+      const bestFormatted = formatTimer(rewardsData.currentBestTime);
+      if (rewardsData.isNewBestTime) {
+        if (elements.modalBestTimeLabel) {
+          elements.modalBestTimeLabel.textContent = '★ NEW BEST TIME!';
+          elements.modalBestTimeLabel.className = 'stat-label new-best-highlight';
+        }
+        elements.modalBestTimeVal.textContent = bestFormatted;
+        elements.modalBestTimeVal.className = 'stat-value new-best-highlight';
+      } else {
+        if (elements.modalBestTimeLabel) {
+          elements.modalBestTimeLabel.textContent = 'BEST TIME';
+          elements.modalBestTimeLabel.className = 'stat-label';
+        }
+        elements.modalBestTimeVal.textContent = bestFormatted;
+        elements.modalBestTimeVal.className = 'stat-value';
+      }
+      elements.modalBestTimeItem.style.display = 'flex';
+    } else {
+      elements.modalBestTimeItem.style.display = 'none';
+    }
+  }
+
+  // Phase 16: Performance Badges List
+  if (elements.modalBadgesSection && elements.modalBadgesList) {
+    elements.modalBadgesList.innerHTML = '';
+    const badges = (rewardsData && Array.isArray(rewardsData.allLevelBadges))
+      ? rewardsData.allLevelBadges
+      : ((rewardsData && Array.isArray(rewardsData.earnedBadgesThisRun)) ? rewardsData.earnedBadgesThisRun : []);
+
+    if (badges.length > 0) {
+      badges.forEach(bKey => {
+        const badgeCfg = BADGE_CONFIG[bKey];
+        if (!badgeCfg) return;
+        const chip = document.createElement('div');
+        chip.className = `badge-chip ${bKey === BADGE_TYPES.PERFECT ? 'badge-perfect' : ''}`;
+        chip.innerHTML = `<span>${badgeCfg.icon}</span><span>${badgeCfg.label}</span>`;
+        chip.title = badgeCfg.desc;
+        elements.modalBadgesList.appendChild(chip);
+      });
+      elements.modalBadgesSection.style.display = 'block';
+    } else {
+      elements.modalBadgesSection.style.display = 'none';
+    }
+  }
+
+  // Phase 15 & 16: Render Itemized Points Breakdown
+  if (elements.modalRewardsBreakdown) {
+    elements.modalRewardsBreakdown.innerHTML = '';
+    if (rewardsData && Array.isArray(rewardsData.breakdown) && rewardsData.breakdown.length > 0) {
+      rewardsData.breakdown.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'reward-breakdown-row';
+        row.innerHTML = `<span class="reward-name">+${item.points} ${item.label}</span><span class="reward-pts">+${item.points}</span>`;
+        elements.modalRewardsBreakdown.appendChild(row);
+      });
+    } else if (rewardsData && rewardsData.isReplay) {
+      const row = document.createElement('div');
+      row.className = 'reward-breakdown-row';
+      row.innerHTML = `<span class="reward-name">REPLAY (BONUSES ALREADY CLAIMED)</span><span class="reward-pts">+0</span>`;
+      elements.modalRewardsBreakdown.appendChild(row);
+    }
+  }
+
+  if (elements.modalTotalEarned) {
+    const earned = rewardsData ? rewardsData.totalEarned : 0;
+    elements.modalTotalEarned.textContent = `+${earned}`;
+  }
+
+  if (elements.modalCurrentPoints) {
+    const pts = rewardsData && typeof rewardsData.totalPoints === 'number'
+      ? rewardsData.totalPoints
+      : getPlayerPoints();
+    elements.modalCurrentPoints.textContent = pts.toLocaleString();
+  }
+
+  // Phase 16: Level 100 Campaign Completion State
+  if (isFinalLevel && elements.modalCampaignMastery) {
+    elements.modalCampaignMastery.style.display = 'block';
+    const summary = getProgressionSummary();
+    if (elements.masteryTotalPoints) elements.masteryTotalPoints.textContent = (rewardsData?.totalPoints || summary.totalPoints).toLocaleString();
+    if (elements.masteryGearsUnlocked) elements.masteryGearsUnlocked.textContent = `${summary.gearsUnlocked} / 10`;
+    if (elements.masteryBadgesEarned) elements.masteryBadgesEarned.textContent = summary.badgesEarned.toString();
+    if (elements.masteryBestPerformance) elements.masteryBestPerformance.textContent = summary.bestPerformance;
+  } else if (elements.modalCampaignMastery) {
+    elements.modalCampaignMastery.style.display = 'none';
+  }
+
+  // Render Newly Unlocked Gears notification
+  const newGearsSection = document.getElementById('modal-new-gears-unlocked');
+  const newGearsList = document.getElementById('modal-new-gears-list');
+  const newlyUnlocked = (rewardsData && Array.isArray(rewardsData.newlyUnlockedGears))
+    ? rewardsData.newlyUnlockedGears
+    : [];
+
+  if (newGearsSection && newGearsList) {
+    newGearsList.innerHTML = '';
+    if (newlyUnlocked.length > 0) {
+      newlyUnlocked.forEach(teeth => {
+        const pill = document.createElement('div');
+        pill.className = 'new-gear-badge-pill';
+        pill.innerHTML = `<span class="gear-ico">⚙</span><span>${teeth}T</span>`;
+        newGearsList.appendChild(pill);
+      });
+      newGearsSection.style.display = 'flex';
+    } else {
+      newGearsSection.style.display = 'none';
+    }
   }
 
   elements.levelCompleteModal.style.display = 'flex';
+
+  // Phase 16 Requirement 3 & 4: Trigger dedicated Automatic Gear Unlock Celebration Modal
+  if (newlyUnlocked.length > 0) {
+    queueUnlockCelebrations(newlyUnlocked);
+  }
 
   const { onNext, onLevelSelect, onReplay } = callbacks;
 
@@ -1099,4 +1376,328 @@ export function prevHowGearsPage() {
     renderHowGearsPage(currentHowGearsPage - 1);
   }
 }
+
+// ==========================================
+// Phase 15: In-Game Points & Gear Inventory UI Functions
+// ==========================================
+
+export function updatePointsUI(points = null) {
+  const pts = points !== null ? points : getPlayerPoints();
+  const formatted = pts.toLocaleString();
+  if (elements.headerPointsVal) {
+    elements.headerPointsVal.textContent = formatted;
+  }
+  if (elements.menuPointsVal) {
+    elements.menuPointsVal.textContent = formatted;
+  }
+  if (elements.invModalTotalPoints) {
+    elements.invModalTotalPoints.textContent = formatted;
+  }
+}
+
+export function openLockedGearModal(teeth) {
+  const cfg = GEAR_UNLOCKS.find(g => g.teeth === teeth);
+  const reqPoints = cfg ? cfg.pointsRequired : 0;
+  const currentPoints = getPlayerPoints();
+  const remaining = Math.max(0, reqPoints - currentPoints);
+
+  if (elements.lockedGearTitle) {
+    elements.lockedGearTitle.textContent = `${teeth}T GEAR LOCKED`;
+  }
+  if (elements.lockedGearDesc) {
+    elements.lockedGearDesc.textContent = `Unlocks automatically at ${reqPoints.toLocaleString()} points.`;
+  }
+  if (elements.lockedCurrentPoints) {
+    elements.lockedCurrentPoints.textContent = currentPoints.toLocaleString();
+  }
+  if (elements.lockedRemainingPoints) {
+    elements.lockedRemainingPoints.textContent = `${remaining.toLocaleString()} points`;
+  }
+  if (elements.lockedGearModal) {
+    elements.lockedGearModal.style.display = 'flex';
+  }
+}
+
+export function closeLockedGearModal() {
+  if (elements.lockedGearModal) {
+    elements.lockedGearModal.style.display = 'none';
+  }
+}
+
+export function openGearInventoryModal() {
+  closeMainMenu();
+  closeLevelSelectModal();
+  closePauseModal();
+  closeLevelComplete();
+
+  renderGearInventoryFull();
+
+  if (elements.gearInventoryModal) {
+    elements.gearInventoryModal.style.display = 'flex';
+  }
+}
+
+export function closeGearInventoryModal() {
+  if (elements.gearInventoryModal) {
+    elements.gearInventoryModal.style.display = 'none';
+  }
+}
+
+export function renderGearInventoryFull() {
+  const currentPoints = getPlayerPoints();
+  if (elements.invModalTotalPoints) {
+    elements.invModalTotalPoints.textContent = currentPoints.toLocaleString();
+  }
+
+  const nextLocked = getNextLockedGear(currentPoints);
+  if (nextLocked) {
+    if (elements.invNextGearCard) elements.invNextGearCard.style.display = 'flex';
+    if (elements.invNextGearTitle) elements.invNextGearTitle.textContent = `${nextLocked.teeth}T`;
+    if (elements.invNextGearFill) elements.invNextGearFill.style.width = `${nextLocked.progressPercent}%`;
+    if (elements.invNextGearSubtext) {
+      elements.invNextGearSubtext.textContent = `${nextLocked.pointsRequired.toLocaleString()} POINTS REQUIRED • ${nextLocked.remainingPoints.toLocaleString()} POINTS TO UNLOCK`;
+    }
+  } else {
+    if (elements.invNextGearCard) {
+      if (elements.invNextGearTitle) elements.invNextGearTitle.textContent = 'ALL GEARS UNLOCKED';
+      if (elements.invNextGearFill) elements.invNextGearFill.style.width = '100%';
+      if (elements.invNextGearSubtext) elements.invNextGearSubtext.textContent = 'Maximum gear progression achieved!';
+    }
+  }
+
+  if (elements.gearInventoryFullGrid) {
+    elements.gearInventoryFullGrid.innerHTML = '';
+    GEAR_UNLOCKS.forEach((cfg) => {
+      const isUnlocked = isGearUnlocked(cfg.teeth, currentPoints);
+      const tile = document.createElement('div');
+      tile.className = `gear-inv-tile ${isUnlocked ? 'unlocked' : 'locked'}`;
+
+      const icon = isUnlocked ? '⚙' : '🔒';
+      const statusText = isUnlocked ? 'UNLOCKED' : 'LOCKED';
+      const statusClass = isUnlocked ? 'status-avail' : 'status-locked';
+      const reqText = isUnlocked
+        ? 'UNLOCKED'
+        : `Automatically unlocks at ${cfg.pointsRequired.toLocaleString()} POINTS`;
+
+      tile.innerHTML = `
+        <span class="gear-inv-icon">${icon}</span>
+        <span class="gear-inv-teeth">${cfg.teeth}T</span>
+        <span class="gear-inv-status ${statusClass}">${statusText}</span>
+        <span class="gear-inv-req">${reqText}</span>
+      `;
+
+      if (!isUnlocked) {
+        tile.style.cursor = 'pointer';
+        tile.title = `Click to view unlock details for ${cfg.teeth}T`;
+        tile.addEventListener('click', () => {
+          openLockedGearModal(cfg.teeth);
+        });
+      }
+
+      elements.gearInventoryFullGrid.appendChild(tile);
+    });
+  }
+}
+
+export function showUnlockToast(teeth) {
+  if (!elements.unlockNotificationToast) return;
+  if (elements.unlockToastTitle) {
+    elements.unlockToastTitle.textContent = `⚙ ${teeth}T GEAR`;
+  }
+  elements.unlockNotificationToast.style.display = 'block';
+
+  // Animate inventory card
+  const card = document.querySelector(`.available-gear-card[data-teeth="${teeth}"]`);
+  if (card) {
+    card.classList.add('gear-unlocked-animate');
+    setTimeout(() => card.classList.remove('gear-unlocked-animate'), 1500);
+  }
+
+  setTimeout(() => {
+    if (elements.unlockNotificationToast) {
+      elements.unlockNotificationToast.style.display = 'none';
+    }
+  }, 2000);
+}
+
+/**
+ * Phase 15 Correction: Sequential Multiple Unlock Notifications
+ * Staggers unlock toasts in sequence without requiring extra user clicks.
+ * @param {number[]} gears - Array of newly unlocked teeth counts
+ */
+export function showUnlockToastsSequentially(gears) {
+  if (!Array.isArray(gears) || gears.length === 0) return;
+  gears.forEach((teeth, index) => {
+    setTimeout(() => {
+      showUnlockToast(teeth);
+    }, index * 2200);
+  });
+}
+
+// ==========================================
+// Phase 16: Player Progress Screen & Mechanical Celebration Modal
+// ==========================================
+
+export function openProgressModal() {
+  closeMainMenu();
+  closePauseModal();
+  closeLevelSelectModal();
+  closeGearInventoryModal();
+  renderProgressModal();
+  if (elements.progressModal) {
+    elements.progressModal.style.display = 'flex';
+  }
+}
+
+export function closeProgressModal() {
+  if (elements.progressModal) {
+    elements.progressModal.style.display = 'none';
+  }
+}
+
+export function renderProgressModal() {
+  const summary = getProgressionSummary();
+
+  if (elements.progTotalPoints) {
+    elements.progTotalPoints.textContent = summary.totalPoints.toLocaleString();
+  }
+  if (elements.progGearsUnlocked) {
+    elements.progGearsUnlocked.textContent = `${summary.gearsUnlocked} / ${summary.totalGears}`;
+  }
+  if (elements.progLevelsCompleted) {
+    elements.progLevelsCompleted.textContent = `${summary.levelsCompleted} / ${summary.totalLevels}`;
+  }
+  if (elements.progBadgesEarned) {
+    elements.progBadgesEarned.textContent = summary.badgesEarned.toString();
+  }
+
+  // Next Gear Progress Bar Panel
+  if (summary.nextGear) {
+    if (elements.progNextGearName) {
+      elements.progNextGearName.textContent = `${summary.nextGear.teeth}T`;
+    }
+    if (elements.progNextGearTarget) {
+      elements.progNextGearTarget.textContent = `${summary.nextGear.pointsRequired.toLocaleString()} POINTS`;
+    }
+    if (elements.progPointsRatio) {
+      elements.progPointsRatio.textContent = `${summary.nextGear.currentPoints.toLocaleString()} / ${summary.nextGear.pointsRequired.toLocaleString()}`;
+    }
+    if (elements.progPointsPct) {
+      elements.progPointsPct.textContent = `${summary.nextGear.progressPercent}%`;
+    }
+    if (elements.progBarFill) {
+      elements.progBarFill.style.width = `${summary.nextGear.progressPercent}%`;
+    }
+    if (elements.progPointsRemaining) {
+      elements.progPointsRemaining.textContent = `${summary.nextGear.remainingPoints.toLocaleString()} POINTS TO GO`;
+    }
+  } else {
+    // All 10 gears unlocked!
+    if (elements.progNextGearName) {
+      elements.progNextGearName.textContent = 'ALL UNLOCKED';
+    }
+    if (elements.progNextGearTarget) {
+      elements.progNextGearTarget.textContent = '10 / 10 GEARS';
+    }
+    if (elements.progPointsRatio) {
+      elements.progPointsRatio.textContent = `${summary.totalPoints.toLocaleString()} POINTS`;
+    }
+    if (elements.progPointsPct) {
+      elements.progPointsPct.textContent = '100%';
+    }
+    if (elements.progBarFill) {
+      elements.progBarFill.style.width = '100%';
+    }
+    if (elements.progPointsRemaining) {
+      elements.progPointsRemaining.textContent = 'MAXIMUM UNLOCKED';
+    }
+  }
+
+  // Compact Recent Rewards History (Max 10)
+  if (elements.progRecentRewardsList) {
+    elements.progRecentRewardsList.innerHTML = '';
+    if (Array.isArray(summary.recentRewards) && summary.recentRewards.length > 0) {
+      summary.recentRewards.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'recent-reward-item';
+
+        const badgesHtml = Array.isArray(item.badges) && item.badges.length > 0
+          ? `<div class="reward-badges-mini">${item.badges.map(b => BADGE_CONFIG[b]?.icon || '★').join(' ')}</div>`
+          : '';
+        const timeHtml = typeof item.timeSeconds === 'number' && item.timeSeconds > 0
+          ? `<span class="reward-item-time">${formatTimer(item.timeSeconds)}</span>`
+          : '';
+
+        row.innerHTML = `
+          <div class="reward-item-left">
+            <span class="reward-item-level">LEVEL ${item.level}</span>
+            <span class="reward-item-pts">+${item.points}</span>
+          </div>
+          <div class="reward-item-right">
+            ${badgesHtml}
+            ${timeHtml}
+          </div>
+        `;
+        elements.progRecentRewardsList.appendChild(row);
+      });
+    } else {
+      const emptyRow = document.createElement('div');
+      emptyRow.className = 'recent-reward-item';
+      emptyRow.innerHTML = `<span class="reward-item-level" style="color: var(--steel);">No recent level completions</span>`;
+      elements.progRecentRewardsList.appendChild(emptyRow);
+    }
+  }
+}
+
+// Celebration Overlay State & Queue
+let unlockCelebrationQueue = [];
+let isCelebrationActive = false;
+let celebrationOnClosedCallback = null;
+
+export function queueUnlockCelebrations(gearsList, onAllComplete = null) {
+  if (!Array.isArray(gearsList) || gearsList.length === 0) {
+    if (onAllComplete) onAllComplete();
+    return;
+  }
+  gearsList.forEach(g => unlockCelebrationQueue.push(g));
+  if (!isCelebrationActive) {
+    processNextCelebration(onAllComplete);
+  }
+}
+
+function processNextCelebration(onAllComplete = null) {
+  if (unlockCelebrationQueue.length === 0) {
+    isCelebrationActive = false;
+    if (onAllComplete) onAllComplete();
+    return;
+  }
+  isCelebrationActive = true;
+  const teeth = unlockCelebrationQueue.shift();
+  openUnlockCelebrationModal(teeth, () => {
+    processNextCelebration(onAllComplete);
+  });
+}
+
+export function openUnlockCelebrationModal(teeth, onClosed = null) {
+  celebrationOnClosedCallback = onClosed;
+  if (elements.celebrationGearTitle) {
+    elements.celebrationGearTitle.textContent = `${teeth}T GEAR`;
+  }
+  if (audio && typeof audio.playCelebrationUnlock === 'function') {
+    audio.playCelebrationUnlock();
+  }
+  if (elements.gearCelebrationModal) {
+    elements.gearCelebrationModal.style.display = 'flex';
+  }
+}
+
+export function closeUnlockCelebrationModal() {
+  if (elements.gearCelebrationModal) {
+    elements.gearCelebrationModal.style.display = 'none';
+  }
+  const cb = celebrationOnClosedCallback;
+  celebrationOnClosedCallback = null;
+  if (cb) cb();
+}
+
 

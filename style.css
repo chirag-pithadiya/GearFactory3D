@@ -3623,4 +3623,1071 @@ html, body {
   }
 }
 
+/* ==========================================================================
+   Phase 15: In-Game Points & Gear Inventory Unlock System Styles
+   ========================================================================== */
+
+/* 1. Header Points Badge */
+.header-points-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.header-points-badge:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(245, 158, 11, 0.70);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+  transform: translateY(-1px);
+}
+
+.header-points-badge .points-icon {
+  font-size: 0.85rem;
+  color: #fbbf24;
+  text-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+.header-points-badge .points-label {
+  font-family: var(--font-display);
+  font-size: 0.60rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+}
+
+.header-points-badge .points-val {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* 2. Main Menu Points Pill */
+.menu-points-badge-row {
+  display: flex;
+  justify-content: center;
+  margin: -6px 0 14px 0;
+}
+
+.menu-points-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(245, 158, 11, 0.40);
+  border-radius: 20px;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+}
+
+.menu-points-pill .points-icon {
+  color: #fbbf24;
+  font-size: 0.95rem;
+}
+
+.menu-points-pill .points-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+}
+
+.menu-points-pill .points-val {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fef08a;
+}
+
+/* 3. Locked Gear Inventory Cards (Sidebar) */
+.available-gear-card.locked {
+  background: rgba(15, 23, 42, 0.55) !important;
+  border: 1px dashed rgba(245, 158, 11, 0.28) !important;
+  opacity: 0.72;
+  cursor: pointer !important;
+  filter: grayscale(0.5);
+}
+
+.available-gear-card.locked:hover {
+  background: rgba(24, 33, 49, 0.85) !important;
+  border-color: rgba(245, 158, 11, 0.60) !important;
+  opacity: 0.95;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.20);
+}
+
+.available-gear-card.locked .gear-card-icon {
+  font-size: 0.78rem;
+  color: #f59e0b;
+}
+
+.available-gear-card.locked .card-status {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  color: #fcd34d !important;
+}
+
+/* Unlock highlight animation on inventory card */
+@keyframes gearUnlockPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+  35% { transform: scale(1.08); box-shadow: 0 0 20px rgba(245, 158, 11, 0.8); border-color: #fbbf24; }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+.gear-unlocked-animate {
+  animation: gearUnlockPulse 1.2s ease-out;
+}
+
+/* 4. Gear Inventory Modal */
+.gear-inventory-dialog {
+  max-width: 580px;
+  width: 92%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.inventory-overview-strip {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.inv-points-card {
+  background: rgba(12, 17, 27, 0.8);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.inv-card-label {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  margin-bottom: 3px;
+}
+
+.inv-card-val {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fbbf24;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.inv-next-gear-card {
+  background: rgba(12, 17, 27, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.next-gear-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.next-gear-title {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #38bdf8;
+}
+
+.next-gear-progress-bar {
+  width: 100%;
+  height: 7px;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.next-gear-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #10b981);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.next-gear-subtext {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  color: #94a3b8;
+}
+
+.gear-inventory-grid-wrapper {
+  background: rgba(8, 12, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+.gear-inventory-full-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.gear-inv-tile {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+  transition: all var(--transition-fast);
+}
+
+.gear-inv-tile.unlocked {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.gear-inv-tile.unlocked:hover {
+  border-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.gear-inv-tile.locked {
+  opacity: 0.65;
+  border-style: dashed;
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(10, 15, 25, 0.6);
+}
+
+.gear-inv-tile.locked:hover {
+  opacity: 0.95;
+  border-color: #f59e0b;
+}
+
+.gear-inv-icon {
+  font-size: 1.1rem;
+  margin-bottom: 2px;
+}
+
+.gear-inv-teeth {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.gear-inv-status {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.gear-inv-status.status-avail {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.gear-inv-status.status-locked {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+}
+
+.gear-inv-req {
+  font-size: 0.52rem;
+  color: #94a3b8;
+  font-family: var(--font-mono);
+}
+
+/* 5. Locked Gear Info Dialog */
+.locked-gear-card {
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+}
+
+.locked-icon-badge {
+  font-size: 2rem;
+  margin-bottom: 4px;
+  color: #f59e0b;
+  text-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+}
+
+.locked-gear-desc {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  margin: 8px 0 14px 0;
+  line-height: 1.4;
+}
+
+.locked-gear-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.locked-stat-item {
+  background: rgba(12, 17, 27, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.highlight-remaining {
+  color: #f59e0b !important;
+  font-family: var(--font-mono);
+  font-size: 1.1rem !important;
+  font-weight: 800;
+}
+
+/* 6. Level Complete Rewards Section */
+.level-rewards-section {
+  background: rgba(10, 16, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rewards-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 4px;
+}
+
+.rewards-label {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+}
+
+.rewards-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 2px 0;
+}
+
+.reward-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.74rem;
+}
+
+.reward-breakdown-row .reward-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.reward-breakdown-row .reward-pts {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  color: #34d399;
+}
+
+.rewards-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 6px;
+  margin-top: 2px;
+}
+
+.reward-summary-tile {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 6px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.reward-summary-tile.earned-tile {
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.reward-summary-tile.earned-tile .summary-val {
+  color: #34d399;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.reward-summary-tile.current-tile {
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.reward-summary-tile.current-tile .summary-val {
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.summary-label {
+  font-family: var(--font-display);
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+/* Phase 15 Correction: Newly Unlocked Gears Announcement Section */
+.modal-new-gears-unlocked {
+  margin-top: 8px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1.5px solid rgba(16, 185, 129, 0.5);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+  animation: unlockGlowPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes unlockGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.45);
+    border-color: rgba(16, 185, 129, 0.8);
+  }
+}
+
+.new-gears-eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #34d399;
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+}
+
+.new-gears-badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.new-gear-badge-pill {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid #34d399;
+  border-radius: 6px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.new-gear-badge-pill .gear-ico {
+  color: #fbbf24;
+}
+
+/* 7. Subtle Industrial Unlock Toast */
+.unlock-notification-toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  border: 2px solid #fbbf24;
+  border-radius: 8px;
+  padding: 10px 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.4);
+  z-index: 10000;
+  pointer-events: none;
+  animation: toastSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+}
+
+@keyframes toastSlideDown {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.unlock-notification-toast .toast-eyebrow {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #fbbf24;
+  margin-bottom: 2px;
+}
+
+.unlock-notification-toast .toast-title {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* 8. Settings Danger Zone */
+.settings-danger-zone {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(239, 68, 68, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.danger-zone-title {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ef4444;
+}
+
+.btn-danger-reset {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  font-family: var(--font-display);
+  font-size: 0.70rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger-reset:hover {
+  background: rgba(239, 68, 68, 0.35);
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .gear-inventory-full-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .inventory-overview-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Phase 16: Player Progression, Reward Polish & Unlock Celebration Styles
+   ========================================================================== */
+
+/* Player Progress Screen Modal */
+.progress-dialog {
+  max-width: 620px;
+  width: 92%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(245, 158, 11, 0.08);
+}
+
+.progress-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.progress-kpi-card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: border-color var(--transition-fast);
+}
+
+.progress-kpi-card:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.kpi-label {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--steel);
+}
+
+.kpi-value {
+  font-family: var(--font-mono);
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.kpi-value.highlight-amber {
+  color: #f59e0b;
+}
+
+.kpi-subtext {
+  font-size: 0.50rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Next Automatic Gear Unlock Progress Bar Panel */
+.progress-next-gear-panel {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.next-gear-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.next-gear-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.next-gear-col.text-right {
+  text-align: right;
+}
+
+.next-gear-eyebrow {
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--steel);
+}
+
+.next-gear-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #f59e0b;
+}
+
+.next-gear-threshold-val {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.prog-bar-ratio-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--steel-light);
+}
+
+.prog-bar-track {
+  height: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.prog-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d97706, #f59e0b);
+  transition: width 0.4s ease;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+}
+
+.prog-bar-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.prog-remaining-label {
+  color: var(--steel);
+}
+
+.prog-remaining-val {
+  color: #f59e0b;
+  font-family: var(--font-mono);
+}
+
+/* Recent Reward History inside Progress Screen */
+.progress-history-section {
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.history-title {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--steel-light);
+  letter-spacing: 0.06em;
+}
+
+.history-badge {
+  font-size: 0.54rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--steel);
+}
+
+.recent-rewards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.recent-reward-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 5px;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+}
+
+.reward-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reward-item-level {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.reward-item-pts {
+  font-weight: 800;
+  color: #10b981;
+}
+
+.reward-item-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reward-item-time {
+  font-size: 0.62rem;
+  color: var(--steel);
+}
+
+/* Automatic Gear Unlock Celebration Modal */
+.celebration-card {
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  border: 2px solid rgba(245, 158, 11, 0.65);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85), 0 0 30px rgba(245, 158, 11, 0.25);
+  padding: 24px 20px;
+  animation: celebration-card-pop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes celebration-card-pop {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.celebration-eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #f59e0b;
+  margin-bottom: 14px;
+}
+
+.celebration-gear-stage {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 12px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.celebration-gear-halo {
+  position: absolute;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.28) 0%, rgba(245, 158, 11, 0) 70%);
+  animation: celebration-halo-pulse 2s infinite ease-in-out;
+}
+
+.celebration-gear-spin {
+  animation: celebration-gear-rotate 9s infinite linear;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes celebration-gear-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes celebration-halo-pulse {
+  0%, 100% { transform: scale(0.92); opacity: 0.6; }
+  50% { transform: scale(1.18); opacity: 1; }
+}
+
+.celebration-gear-title {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  letter-spacing: 0.04em;
+}
+
+.celebration-subtitle {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.08em;
+  margin: 0 0 12px 0;
+}
+
+.celebration-points-note {
+  font-size: 0.62rem;
+  color: var(--steel);
+  margin-bottom: 16px;
+}
+
+/* Level Complete Screen Enhancement */
+.modal-level-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 4px;
+  padding: 2px 10px;
+  margin: 0 auto 10px auto;
+}
+
+.level-badges-section {
+  margin: 10px 0;
+  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.badges-label {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  color: var(--steel);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.modal-badges-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  background: rgba(59, 130, 246, 0.14);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
+}
+
+.badge-chip.badge-perfect {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.6);
+  color: #fbbf24;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+}
+
+.new-best-highlight {
+  color: #f59e0b !important;
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+/* Campaign 100 Mastery Plaque */
+.campaign-mastery-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.95));
+  border: 2px solid rgba(245, 158, 11, 0.6);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.mastery-banner-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #f59e0b;
+  letter-spacing: 0.06em;
+}
+
+.mastery-banner-sub {
+  font-size: 0.68rem;
+  color: #38bdf8;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.mastery-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.mastery-stat-item {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.m-label {
+  font-size: 0.54rem;
+  color: var(--steel);
+  font-weight: 700;
+}
+
+.m-val {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* Level Select Badges & Completion Status */
+.level-tile.completed {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.level-tile-status.status-complete {
+  color: #10b981;
+  font-weight: 700;
+  font-size: 0.56rem;
+}
+
+.level-tile-badges {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.level-tile-badge-icon {
+  font-size: 0.52rem;
+  color: #f59e0b;
+}
+
+/* Mobile adjustments for Phase 16 */
+@media (max-width: 600px) {
+  .progress-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .progress-dialog {
+    padding: 14px 10px;
+  }
+}
+
+
 

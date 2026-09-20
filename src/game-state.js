@@ -12,7 +12,7 @@
 export const GEAR_MODULE = 0.16;
 
 // Available physical gear inventory (teeth count)
-export const GEAR_INVENTORY = [10, 20, 30, 40, 50, 60];
+export const GEAR_INVENTORY = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 // Main gearbox simulation operational state
 export const state = {
@@ -47,6 +47,10 @@ export const puzzleState = {
   isSolutionPass: false,
   hasCheckedSolution: false,
   lastCalculatedRPM: null,
+  attemptsCount: 0,
+  failedChecksCount: 0,
+  hintUsedThisLevel: false,
+  isFirstAttemptSession: true,
 };
 
 // Telemetry registry for inspection and debugging

@@ -8,6 +8,7 @@ if (-not (Test-Path $distDir)) {
 
 $filesInOrder = @(
     "src/game-state.js",
+    "src/points.js",
     "src/levels.js",
     "src/audio.js",
     "src/gears.js",

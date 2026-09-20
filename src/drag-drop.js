@@ -18,6 +18,7 @@ import * as THREE from 'three';
 import { GEAR_MODULE } from './game-state.js';
 import { createSpurGear } from './gears.js';
 import { audio } from './audio.js';
+import { isGearUnlocked } from './points.js';
 
 export const dragDropState = {
   isDragging: false,
@@ -178,7 +179,7 @@ export function updateDropTargetPositions(shaftY, posZInput, posZOutput) {
  * Starts 3D dragging for a given gear teeth count.
  */
 export function startGearDrag(teeth, event) {
-  if (!teeth || dragDropState.isDragging) return;
+  if (!teeth || dragDropState.isDragging || !isGearUnlocked(teeth)) return;
   if (typeof window !== 'undefined' && window.gearFactoryState?.isPaused) return;
 
   const { scene, camera, controls, canvas } = dragDropState;
@@ -480,7 +481,7 @@ export function bindCardDragListeners() {
     card.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return; // Left click only
       const teeth = parseInt(card.getAttribute('data-teeth'), 10);
-      if (!teeth) return;
+      if (!teeth || card.classList.contains('locked') || !isGearUnlocked(teeth)) return;
 
       pointerDownPos = { x: e.clientX, y: e.clientY };
       isPendingDrag = true;
@@ -517,7 +518,7 @@ export function bindCardDragListeners() {
         const touch = e.touches[0];
         if (!touch) return;
         const teeth = parseInt(card.getAttribute('data-teeth'), 10);
-        if (!teeth) return;
+        if (!teeth || card.classList.contains('locked') || !isGearUnlocked(teeth)) return;
 
         pointerDownPos = { x: touch.clientX, y: touch.clientY };
         isPendingDrag = true;
