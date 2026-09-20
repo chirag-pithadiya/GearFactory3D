@@ -136,9 +136,9 @@ updateCameraAspect(initWidth, initHeight);
 setupLighting(scene);
 const controls = initControls(camera, renderer.domElement);
 
-// Ensure camera is cleanly framed on the meshing gears
-camera.position.set(-8.6, 6.5, 14.0);
-controls.target.set(0.0, 4.4, -0.4);
+// Ensure camera is cleanly framed on the complete industrial machine
+camera.position.set(-12.5, 8.8, 19.0);
+controls.target.set(0.0, 5.2, 0.0);
 controls.update();
 
 // Assembly reference holder
@@ -1132,6 +1132,7 @@ window.gearFactory = {
   camera,
   controls: getControls(),
   renderer: getRenderer(),
+  get currentAssembly() { return currentAssembly; },
   get inputGear() { return currentAssembly.inputGear; },
   get outputGear() { return currentAssembly.outputGear; },
   get gear() { return currentAssembly.inputGear; },
