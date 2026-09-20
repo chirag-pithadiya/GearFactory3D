@@ -146,6 +146,7 @@ try {
             $script:passedTests++
             Write-Host "  [PASS] $message" -ForegroundColor Green
             return $true
+            
         } else {
             Write-Host "  [FAIL] $message" -ForegroundColor Red
             return $false
@@ -244,6 +245,7 @@ try {
             inShaftZ: inShaft ? inShaft.position.z : null,
             outShaftY: outShaft ? outShaft.position.y : null,
             outShaftZ: outShaft ? outShaft.position.z : null,
+            
             shaftY: assembly.shaftY,
             posZInput: assembly.posZInput,
             posZOutput: assembly.posZOutput
