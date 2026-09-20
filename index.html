@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gear Factory 3D — Industrial Kinetic Simulator</title>
-  <meta name="description" content="A browser-based 3D game and mechanical simulator featuring procedural gears, tactile factory physics, and kinetic automation.">
+  <meta name="description"
+    content="A browser-based 3D game and mechanical simulator featuring procedural gears, tactile factory physics, and kinetic automation.">
   <meta name="theme-color" content="#12161f">
 
   <!-- Google Fonts: Inter & Outfit for modern industrial typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
 
   <!-- Main Stylesheet -->
   <link rel="stylesheet" href="./style.css">
 
 </head>
+
 <body>
   <!-- Top Application Header -->
   <header class="app-header">
@@ -23,8 +28,9 @@
       <div class="logo-group">
         <div class="logo-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
           </svg>
         </div>
         <div class="logo-text">
@@ -34,41 +40,42 @@
       </div>
 
       <div class="header-nav-actions">
-        <button type="button" class="btn-header-nav btn-header-play" id="btn-header-play" title="Play next available level">
+        <button type="button" class="btn-header-nav btn-header-play" id="btn-header-play"
+          title="Play next available level">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-            <polygon points="5 3 19 12 5 21 5 3"/>
+            <polygon points="5 3 19 12 5 21 5 3" />
           </svg>
           <span>PLAY</span>
         </button>
         <button type="button" class="btn-header-nav" id="btn-header-level-select" title="Open Level Select menu">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
-            <rect x="3" y="3" width="7" height="7"/>
-            <rect x="14" y="3" width="7" height="7"/>
-            <rect x="14" y="14" width="7" height="7"/>
-            <rect x="3" y="14" width="7" height="7"/>
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
           </svg>
           <span>LEVEL SELECT</span>
         </button>
         <button type="button" class="btn-header-nav" id="btn-header-tutorial" title="Open interactive tutorial">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
           <span>TUTORIAL</span>
         </button>
         <button type="button" class="btn-header-nav" id="btn-header-pause" title="Pause simulation">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-            <rect x="6" y="4" width="4" height="16"/>
-            <rect x="14" y="4" width="4" height="16"/>
+            <rect x="6" y="4" width="4" height="16" />
+            <rect x="14" y="4" width="4" height="16" />
           </svg>
           <span>PAUSE</span>
         </button>
         <button type="button" class="btn-header-nav" id="btn-header-menu" title="Open Main Menu">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
           <span>MENU</span>
         </button>
@@ -105,15 +112,15 @@
         <div class="viewport-buttons-group">
           <button id="btn-toggle-labels" class="btn-mini" title="Toggle 3D Component Labels">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-              <line x1="7" y1="7" x2="7.01" y2="7"/>
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+              <line x1="7" y1="7" x2="7.01" y2="7" />
             </svg>
             <span id="label-toggle-text">Labels: OFF</span>
           </button>
           <button id="btn-camera-reset" class="btn-mini" title="Reset 3D camera view">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
             </svg>
             <span>Reset View</span>
           </button>
@@ -129,23 +136,23 @@
         <div class="machine-buttons-row">
           <button id="btn-start" class="btn btn-primary" title="Spin up gear train">
             <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="5 3 19 12 5 21 5 3"/>
+              <polygon points="5 3 19 12 5 21 5 3" />
             </svg>
             <span>Start</span>
           </button>
 
           <button id="btn-stop" class="btn btn-secondary" title="Halt gear rotation">
             <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="4" width="4" height="16"/>
-              <rect x="14" y="4" width="4" height="16"/>
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
             </svg>
             <span>Stop</span>
           </button>
 
           <button id="btn-reset" class="btn btn-tertiary" title="Reset angle and stop">
             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <polyline points="1 4 1 10 7 10"/>
-              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
             </svg>
             <span>Reset</span>
           </button>
@@ -215,18 +222,20 @@
           <div class="inventory-header">
             <div class="inventory-title-group">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
               <span class="inventory-title">AVAILABLE GEARS</span>
             </div>
             <div class="inventory-selection-badge" id="inventory-selection-badge">
               Selected: <span id="selected-inventory-gear-name">None</span>
             </div>
-            <button type="button" class="btn-clear-selection" id="btn-clear-selection" title="Unmount both gears from shafts">
+            <button type="button" class="btn-clear-selection" id="btn-clear-selection"
+              title="Unmount both gears from shafts">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
               </svg>
               <span>Clear Selection</span>
             </button>
@@ -234,37 +243,43 @@
 
           <!-- 1. Available Gear Inventory Row -->
           <div class="available-gears-grid" id="available-gears-list">
-            <button type="button" class="available-gear-card gear-chip" data-teeth="10" id="inv-card-10" title="Select 10T Gear">
+            <button type="button" class="available-gear-card gear-chip" data-teeth="10" id="inv-card-10"
+              title="Select 10T Gear">
               <span class="gear-card-icon">⚙</span>
               <span class="card-teeth gear-card-name">10T</span>
               <span class="card-dia gear-card-spec">Ø 10mm</span>
               <span class="card-status inv-status">READY</span>
             </button>
-            <button type="button" class="available-gear-card gear-chip" data-teeth="20" id="inv-card-20" title="Select 20T Gear">
+            <button type="button" class="available-gear-card gear-chip" data-teeth="20" id="inv-card-20"
+              title="Select 20T Gear">
               <span class="gear-card-icon">⚙</span>
               <span class="card-teeth gear-card-name">20T</span>
               <span class="card-dia gear-card-spec">Ø 20mm</span>
               <span class="card-status inv-status">READY</span>
             </button>
-            <button type="button" class="available-gear-card gear-chip" data-teeth="30" id="inv-card-30" title="Select 30T Gear">
+            <button type="button" class="available-gear-card gear-chip" data-teeth="30" id="inv-card-30"
+              title="Select 30T Gear">
               <span class="gear-card-icon">⚙</span>
               <span class="card-teeth gear-card-name">30T</span>
               <span class="card-dia gear-card-spec">Ø 30mm</span>
               <span class="card-status inv-status">READY</span>
             </button>
-            <button type="button" class="available-gear-card gear-chip" data-teeth="40" id="inv-card-40" title="Select 40T Gear">
+            <button type="button" class="available-gear-card gear-chip" data-teeth="40" id="inv-card-40"
+              title="Select 40T Gear">
               <span class="gear-card-icon">⚙</span>
               <span class="card-teeth gear-card-name">40T</span>
               <span class="card-dia gear-card-spec">Ø 40mm</span>
               <span class="card-status inv-status">READY</span>
             </button>
-            <button type="button" class="available-gear-card gear-chip" data-teeth="50" id="inv-card-50" title="Select 50T Gear">
+            <button type="button" class="available-gear-card gear-chip" data-teeth="50" id="inv-card-50"
+              title="Select 50T Gear">
               <span class="gear-card-icon">⚙</span>
               <span class="card-teeth gear-card-name">50T</span>
               <span class="card-dia gear-card-spec">Ø 50mm</span>
               <span class="card-status inv-status">READY</span>
             </button>
-            <button type="button" class="available-gear-card gear-chip" data-teeth="60" id="inv-card-60" title="Select 60T Gear">
+            <button type="button" class="available-gear-card gear-chip" data-teeth="60" id="inv-card-60"
+              title="Select 60T Gear">
               <span class="gear-card-icon">⚙</span>
               <span class="card-teeth gear-card-name">60T</span>
               <span class="card-dia gear-card-spec">Ø 60mm</span>
@@ -284,11 +299,13 @@
                 <span class="selected-badge input-badge slot-mounted-badge" id="selected-input-gear-display">NONE</span>
               </div>
               <div class="slot-action-area">
-                <button type="button" class="btn-slot-place btn-place-input" id="btn-place-input" title="Place selected gear on Input Shaft">
+                <button type="button" class="btn-slot-place btn-place-input" id="btn-place-input"
+                  title="Place selected gear on Input Shaft">
                   <span class="slot-btn-icon">⚙</span>
                   <span class="slot-btn-text" id="btn-place-input-text">PLACE GEAR</span>
                 </button>
-                <button type="button" class="btn-slot-clear" id="btn-clear-input" title="Remove gear from Input Shaft" style="display: none;">
+                <button type="button" class="btn-slot-clear" id="btn-clear-input" title="Remove gear from Input Shaft"
+                  style="display: none;">
                   ✕
                 </button>
               </div>
@@ -302,14 +319,17 @@
                   <span class="slot-indicator-dot dot-output"></span>
                   <span class="slot-title">OUTPUT GEAR</span>
                 </div>
-                <span class="selected-badge output-badge slot-mounted-badge" id="selected-output-gear-display">NONE</span>
+                <span class="selected-badge output-badge slot-mounted-badge"
+                  id="selected-output-gear-display">NONE</span>
               </div>
               <div class="slot-action-area">
-                <button type="button" class="btn-slot-place btn-place-output" id="btn-place-output" title="Place selected gear on Output Shaft">
+                <button type="button" class="btn-slot-place btn-place-output" id="btn-place-output"
+                  title="Place selected gear on Output Shaft">
                   <span class="slot-btn-icon">⚙</span>
                   <span class="slot-btn-text" id="btn-place-output-text">PLACE GEAR</span>
                 </button>
-                <button type="button" class="btn-slot-clear" id="btn-clear-output" title="Remove gear from Output Shaft" style="display: none;">
+                <button type="button" class="btn-slot-clear" id="btn-clear-output" title="Remove gear from Output Shaft"
+                  style="display: none;">
                   ✕
                 </button>
               </div>
@@ -353,25 +373,27 @@
       <div class="puzzle-banner puzzle-success-banner" id="puzzle-success-banner" style="display: none;">
         <div class="banner-icon success-icon">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="20 6 9 17 4 12"/>
+            <polyline points="20 6 9 17 4 12" />
           </svg>
         </div>
         <div class="banner-content">
           <strong class="banner-title success-title">LEVEL COMPLETE!</strong>
-          <span class="banner-desc" id="success-banner-desc">Calculated speed matches target RPM within tolerance.</span>
+          <span class="banner-desc" id="success-banner-desc">Calculated speed matches target RPM within
+            tolerance.</span>
         </div>
       </div>
 
       <div class="puzzle-banner puzzle-fail-banner" id="puzzle-fail-banner" style="display: none;">
         <div class="banner-icon fail-icon">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </div>
         <div class="banner-content">
           <strong class="banner-title fail-title">TRY AGAIN</strong>
-          <span class="banner-desc" id="fail-banner-desc">Speed does not match target. Adjust your selected gears!</span>
+          <span class="banner-desc" id="fail-banner-desc">Speed does not match target. Adjust your selected
+            gears!</span>
         </div>
       </div>
 
@@ -379,33 +401,34 @@
       <div class="puzzle-actions-grid">
         <button id="btn-check-solution" class="btn-puzzle btn-check" title="Calculate output RPM and check solution">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
           <span>Check Solution</span>
         </button>
 
         <button id="btn-reset-level" class="btn-puzzle btn-reset-lvl" title="Reset gear selections for this level">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-            <path d="M3 3v5h5"/>
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
           </svg>
           <span>Reset Level</span>
         </button>
 
         <button id="btn-prev-level" class="btn-puzzle btn-prev" disabled title="Go to previous level">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2">
-            <line x1="19" y1="12" x2="5" y2="12"/>
-            <polyline points="12 19 5 12 12 5"/>
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
           </svg>
           <span>Previous Level</span>
         </button>
 
-        <button id="btn-next-level" class="btn-puzzle btn-next" disabled title="Advance to next level (locked until solved)">
+        <button id="btn-next-level" class="btn-puzzle btn-next" disabled
+          title="Advance to next level (locked until solved)">
           <span>Next Level</span>
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2">
-            <line x1="5" y1="12" x2="19" y2="12"/>
-            <polyline points="12 5 19 12 12 19"/>
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
           </svg>
         </button>
       </div>
@@ -512,6 +535,7 @@
 
   <!-- Level Complete Screen Modal (Phase 7) -->
   <div class="modal-backdrop" id="level-complete-modal" style="display: none;">
+
     <div class="level-complete-card industrial-dialog">
       <div class="tut-complete-icon">✓</div>
       <div class="modal-eyebrow">MISSION ACCOMPLISHED</div>
@@ -581,4 +605,5 @@
   <!-- Unified Production Bundle (Works directly via file:/// and http://) -->
   <script src="./dist/bundle.js"></script>
 </body>
+
 </html>
